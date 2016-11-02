@@ -1083,8 +1083,6 @@ namespace DotsGame
         public Dot CheckPattern_vilochka(int Owner)
         {
             int enemy_own = Owner == 1 ? 2 : 1;
-            //ArrayDots this = Dots.CopyArrayDots;
-
             var get_non_blocked = from Dot d in this where d.Blocked == false select d; //получить коллекцию незаблокированных точек
 
             //паттерн на диагональное расположение точек         *d   
@@ -1136,10 +1134,6 @@ namespace DotsGame
                              & this[d.x - 1, d.y + 1].Own == 0 & this[d.x - 1, d.y + 1].Blocked == false
                              & this[d.x, d.y + 2].Own == 0 & this[d.x, d.y + 2].Blocked == false
                              & this[d.x - 2, d.y].Own == 0 & this[d.x - 2, d.y].Blocked == false
-                             //& this[d.x + 2, d.y + 1].Own != enemy_own & this[d.x + 2, d.y + 1].Blocked == false
-                             //& this[d.x + 1, d.y].Own != enemy_own & this[d.x + 1, d.y].Blocked == false
-                             //& this[d.x, d.y -1].Own != enemy_own & this[d.x, d.y -1].Blocked == false
-                             //& this[d.x -1, d.y -2].Own != enemy_own & this[d.x -1, d.y -2].Blocked == false
                              & this[d.x - 1, d.y + 2].Own != enemy_own & this[d.x - 1, d.y + 2].Blocked == false
                              & this[d.x - 2, d.y + 1].Own != enemy_own & this[d.x - 2, d.y + 1].Blocked == false
                          select d;
@@ -1157,10 +1151,6 @@ namespace DotsGame
                              & this[d.x + 1, d.y - 1].Own == 0 & this[d.x + 1, d.y - 1].Blocked == false
                              & this[d.x, d.y - 2].Own == 0 & this[d.x, d.y - 2].Blocked == false
                              & this[d.x + 2, d.y].Own == 0 & this[d.x + 2, d.y].Blocked == false
-                             //& this[d.x -2, d.y -1].Own != enemy_own & this[d.x -2, d.y -1].Blocked == false
-                             //& this[d.x -1, d.y].Own != enemy_own & this[d.x -1, d.y].Blocked == false
-                             //& this[d.x, d.y + 1].Own != enemy_own & this[d.x, d.y + 1].Blocked == false
-                             //& this[d.x + 1, d.y + 2].Own != enemy_own & this[d.x + 1, d.y + 2].Blocked == false
                              & this[d.x + 1, d.y - 2].Own != enemy_own & this[d.x + 1, d.y - 2].Blocked == false
                              & this[d.x + 2, d.y - 1].Own != enemy_own & this[d.x + 2, d.y - 1].Blocked == false
                          select d;

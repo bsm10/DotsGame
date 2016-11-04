@@ -4,23 +4,19 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
 using System.Threading;
+using Windows.Foundation;
 
 namespace DotsGame
 {
 
-    //static class Extensions
-    //{
-    //    //public static IList<T> Clone<T>(this IList<T> listToClone) where T : ICloneable
-    //    //{
-    //    //    return listToClone.Select(item => (T)item.Clone()).ToList();
-    //    //}
-    //    public static IList<Dot> Clone<Dot>(this IList<Dot> listToClone) where Dot : ICloneable
-    //    {
-    //        return listToClone.Select(item => (Dot)item.Clone()).ToList();
-    //    }
-
-    //}
-    public class GameDots : IEnumerator, IEnumerable
+    static class Extensions
+    {
+        //public static IList<T> Clone<T>(this IList<T> listToClone) where T : ICloneable
+        //{
+        //    return listToClone.Select(item => (T)item.Clone()).ToList();
+        //}
+    }
+    public class GameDots : IEnumerator, IEnumerable, IGame
     {
         private const int PLAYER_DRAW = -1;
         private const int PLAYER_NONE = 0;
@@ -66,7 +62,6 @@ namespace DotsGame
                 }
             }
         }
-
         public List<Dot> ListDotsForDrawing
         {// главная коллекция для отрисовки партии
             get
@@ -198,7 +193,6 @@ namespace DotsGame
 
             public override bool Equals(Dot d1, Dot d2)
             {
-                //return Default.Equals(d1, d2);
                 return (d1.x == d2.x & d1.y == d2.y); 
             }
         }
@@ -217,7 +211,6 @@ namespace DotsGame
                 if (j >= BoardHeight) j = BoardHeight - 1;
                 if (i < 0) i = 0;
                 if (j < 0) j = 0;
-                //return DotIndexCheck(i,j) ? null : _Dots[IndexDot(i, j)];
                 return _Dots[IndexDot(i, j)];
             }
         }
@@ -3126,12 +3119,162 @@ namespace DotsGame
         //IEnumerable
         public void Reset()
         { position = 0; }
+
+        public IScore GetScore()
+        {
+            throw new NotImplementedException();
+        }
+
+        public State GetSpaceState(int row, int column)
+        {
+            throw new NotImplementedException();
+        }
+
+        public bool IsValidMove(Dot move)
+        {
+            throw new NotImplementedException();
+        }
+
+        public bool IsValidMove(int row, int column)
+        {
+            throw new NotImplementedException();
+        }
+
+        public bool IsPassValid()
+        {
+            throw new NotImplementedException();
+        }
+
+        public bool IsGameOver()
+        {
+            throw new NotImplementedException();
+        }
+
+        public IAsyncOperation<int> MoveAsync(Dot move)
+        {
+            throw new NotImplementedException();
+        }
+
+        public IAsyncOperation<int> MoveAsync(int row, int column)
+        {
+            throw new NotImplementedException();
+        }
+
+        public IAsyncAction MoveAsync(string moves)
+        {
+            throw new NotImplementedException();
+        }
+
+        public IAsyncAction AiMoveAsync(int searchDepth)
+        {
+            throw new NotImplementedException();
+        }
+
+        public IAsyncOperation<Dot> GetBestMoveAsync(int searchDepth)
+        {
+            throw new NotImplementedException();
+        }
+
+        public void LoadSerializedBoardState(string state)
+        {
+            throw new NotImplementedException();
+        }
+
         //IEnumerable
         public object Current
         {
             get
             {
                 return _Dots[position];
+            }
+        }
+
+        public IList<Dot> Board
+        {
+            get
+            {
+                throw new NotImplementedException();
+            }
+
+            set
+            {
+                throw new NotImplementedException();
+            }
+        }
+
+        public int RowCount
+        {
+            get
+            {
+                throw new NotImplementedException();
+            }
+
+            set
+            {
+                throw new NotImplementedException();
+            }
+        }
+
+        public int ColumnCount
+        {
+            get
+            {
+                throw new NotImplementedException();
+            }
+
+            set
+            {
+                throw new NotImplementedException();
+            }
+        }
+
+        public IList<Dot> Moves
+        {
+            get
+            {
+                throw new NotImplementedException();
+            }
+
+            set
+            {
+                throw new NotImplementedException();
+            }
+        }
+
+        public IList<Dot> MoveStack
+        {
+            get
+            {
+                throw new NotImplementedException();
+            }
+
+            set
+            {
+                throw new NotImplementedException();
+            }
+        }
+
+        public State CurrentPlayer
+        {
+            get
+            {
+                throw new NotImplementedException();
+            }
+        }
+
+        public State CurrentOpponent
+        {
+            get
+            {
+                throw new NotImplementedException();
+            }
+        }
+
+        public State Winner
+        {
+            get
+            {
+                throw new NotImplementedException();
             }
         }
     }

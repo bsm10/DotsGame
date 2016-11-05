@@ -638,6 +638,7 @@ namespace DotsGame
             {
                 ListMoves.Add(_Dots[IndexDot(dot.x, dot.y)]);
                 LinkDots();//перестроить связи точек
+                _ListLinksForDrawing = lnks.ToList();
             }
             return res;
         }
@@ -767,6 +768,14 @@ namespace DotsGame
         { 
             get {return lnks;}
         }
+
+
+        private List<Links> _ListLinksForDrawing = new List<Links>();
+        public List<Links> ListLinksForDrawing
+        {
+            get { return _ListLinksForDrawing; }
+        }
+
         private void LinkDots()//устанавливает связь между двумя точками и возвращает массив связей 
         {
             lnks.Clear();

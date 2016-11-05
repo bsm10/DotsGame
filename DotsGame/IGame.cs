@@ -11,7 +11,6 @@ namespace DotsGame
         int BoardHeight { get; set; }
         IList<Dot> Moves { get; set; }
         IList<Dot> ListMoves { get; set; }
-
         State CurrentPlayer { get; }
         State CurrentOpponent { get; }
         State Winner { get; }
@@ -21,11 +20,10 @@ namespace DotsGame
         bool IsValidMove(Dot move);
         bool IsValidMove(int row, int column);
         bool IsGameOver { get; }
-
-        //[Windows.Foundation.Metadata.DefaultOverload()]
-        //IAsyncOperation<int> MoveAsync(Dot move);
         void Move(int player, CancellationToken? cancellationToken, Dot pl_move = null);
-        //IAsyncAction MoveAsync(int player);
+
+
+
         string ToString();
 
     }

@@ -1,15 +1,16 @@
 ﻿using System.Collections.Generic;
+using System.Threading;
 using Windows.Foundation;
 
 namespace DotsGame
 {
     public interface IGame
     {
-        IList<Dot> Board { get; set; }
-        int RowCount { get; set; }
-        int ColumnCount { get; set; }
+        IList<Dot> Dots { get; set; }
+        int BoardWidth { get; set; }
+        int BoardHeight { get; set; }
         IList<Dot> Moves { get; set; }
-        IList<Dot> MoveStack { get; set; }
+        IList<Dot> ListMoves { get; set; }
 
         State CurrentPlayer { get; }
         State CurrentOpponent { get; }
@@ -19,18 +20,13 @@ namespace DotsGame
         State GetSpaceState(int row, int column);
         bool IsValidMove(Dot move);
         bool IsValidMove(int row, int column);
-        bool IsPassValid();
-        bool IsGameOver();
+        bool IsGameOver { get; }
 
         //[Windows.Foundation.Metadata.DefaultOverload()]
-        IAsyncOperation<int> MoveAsync(Dot move);
-        IAsyncOperation<int> MoveAsync(int row, int column);
-        IAsyncAction MoveAsync(string moves);
-        IAsyncAction AiMoveAsync(int searchDepth);
-        IAsyncOperation<Dot> GetBestMoveAsync(int searchDepth);
-
+        //IAsyncOperation<int> MoveAsync(Dot move);
+        void Move(int player, CancellationToken? cancellationToken, Dot pl_move = null);
+        //IAsyncAction MoveAsync(int player);
         string ToString();
-        void LoadSerializedBoardState(string state);
 
     }
     public enum State

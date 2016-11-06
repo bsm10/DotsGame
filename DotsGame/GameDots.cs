@@ -828,7 +828,7 @@ namespace DotsGame
         /// </summary>
         /// <param name="Owner">владелец проверянмых точек</param>
         /// <returns>Возвращает ход(точку) который завершает окружение</returns>
-        private Dot CheckMove(int Owner)
+        private Dot CheckMove1(int Owner)
         {
             List<Dot> happy_dots = new List<Dot>();
             var qry = Board_ValidMoves.Where(
@@ -1022,6 +1022,43 @@ namespace DotsGame
             return x.Count() > 0 ? x.First() : null;
 
         }
+        private Dot CheckMove(int Owner)
+        {
+            List<Dot> happy_dots = new List<Dot>();
+            var qry = from Dot d1 in this
+                      where d1.Own == Owner
+                      from Dot d2 in this
+                      where d2.IndexRelation == d1.IndexRelation && Distance(d1,d2)>=2 & Distance(d1, d2)<3
+                      from Dot d in this
+                      where d.ValidMove & Distance(d, d1) < 2 & Distance(d, d2) < 2
+                      select d;
+            
+            foreach (Dot d in qry.Distinct(new DotEq()).ToList())
+            {
+                //делаем ход
+                int result_last_move = MakeMove(d, Owner);
+#if DEBUG
+                //if (f.chkMove.Checked) Pause();
+#endif
+                //-----------------------------------
+                if (result_last_move != 0 & this[d.x, d.y].Blocked == false)
+                {
+                    UndoMove(d);
+                    d.CountBlockedDots = result_last_move;
+                    happy_dots.Add(d);
+                    //return d;
+                }
+                UndoMove(d);
+            }
+
+            //выбрать точку, которая максимально окружит
+            var x = happy_dots.Where(dd =>
+                    dd.CountBlockedDots == happy_dots.Max(dt => dt.CountBlockedDots));
+
+            return x.Count() > 0 ? x.First() : null;
+
+        }
+
         private Dot CheckPatternVilkaNextMove(int Owner)
         {
             var qry = Board_NotEmptyNonBlockedDots.Where(dt => dt.Own == Owner);

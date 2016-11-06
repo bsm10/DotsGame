@@ -28,7 +28,7 @@ namespace DotsGame
         public override int GetHashCode()
         {
             //Check whether the object is null
-            if (object.ReferenceEquals(this, null)) return 0;
+            if (ReferenceEquals(this, null)) return 0;
 
             //Get hash code for the Dot1
             int hashLinkDot1 = Dot1.GetHashCode();
@@ -57,25 +57,12 @@ namespace DotsGame
         }
 
 
-        public Links(Dot Dot1, Dot Dot2)
+        public Links(Dot dot1, Dot dot2)
         {
-            this.Dot1 = Dot1;
-            this.Dot2 = Dot2;
-           
-        }
-
-        public Links(int x1, int y1, int x2, int y2)
-        {
-            Dot1 = new Dot(x1, y1);
-            Dot2 = new Dot(x2, y2);
-            //if (Math.Abs(Dot1.x - Dot2.x) + Math.Abs(Dot1.y - Dot2.y) < 2)
-            //{
-            //    cost = 1;
-            //}
-            //else
-            //{
-            //    cost = 0.5f;
-            //}
+            Dot1 = dot1;
+            Dot2 = dot2;
+            //if (dot1.BlokingDots.Count > dot2.BlokingDots.Count) dot2.BlokingDots.AddRange(dot1.BlokingDots);
+            //if (dot2.BlokingDots.Count > dot1.BlokingDots.Count) dot1.BlokingDots.AddRange(dot2.BlokingDots);
         }
 
         public bool Equals(Links otherLink)//Проверяет равенство связей по точкам
@@ -98,7 +85,7 @@ namespace DotsGame
         public int GetHashCode(Links links)
         {
             //Check whether the object is null
-            if (object.ReferenceEquals(links, null)) return 0;
+            if (ReferenceEquals(links, null)) return 0;
 
             //Get hash code for the Name field if it is not null.
             int hashLinkDot1 = links.Dot1.GetHashCode();

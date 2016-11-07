@@ -31,6 +31,9 @@ namespace DotsGame
             get { return list_moves; }
             set { list_moves = value; }
         }
+
+        private IList<Dot> stackMoves; //список ходов
+
         public Dot LastMove
         {
             get
@@ -164,6 +167,7 @@ namespace DotsGame
 
             lnks = new List<Links>();
             list_moves = new List<Dot>();
+            stackMoves = new List<Dot>();
             dots_in_region = new List<Dot>();
 
         }
@@ -209,8 +213,7 @@ namespace DotsGame
                 if (dot.x == 0 | dot.x == (BoardWidth - 1) | dot.y == 0 | 
                     dot.y == (BoardHeight - 1)) _Dots[ind].Fixed = true;
                 AddNeibor(_Dots[ind]);
-
-                //ListMoves.Add(_Dots[ind]);
+                stackMoves.Add(_Dots[ind]);
             }
         }
         private void AddNeibor(Dot dot)
@@ -247,6 +250,7 @@ namespace DotsGame
                 _Dots[ind].IndexDot = i;
                 _Dots[ind].IndexRelation = i;
                 ListMoves.Remove(dot);
+                stackMoves.Remove(dot);
             }
         }
         private float Distance(Dot dot1, Dot dot2)//расстояние между точками
@@ -483,9 +487,14 @@ namespace DotsGame
         {
             GameDots _Dots = new GameDots(BoardWidth,BoardHeight);
 
-            foreach (Dot dot in ListMoves)
+            //foreach (Dot dot in ListMoves)
+            //{
+            //    _Dots.MakeMove(dot, dot.Own, addForDraw: true);
+            //}
+            foreach (Dot dot in stackMoves)
             {
-                _Dots.MakeMove(dot, dot.Own, addForDraw: true);
+                if(ListMoves.Contains(dot))_Dots.MakeMove(dot, dot.Own, addForDraw: true);
+                else _Dots.MakeMove(dot, dot.Own);
             }
             _Dots.RescanBlockedDots();
             Dots = _Dots.Dots;
@@ -1046,7 +1055,7 @@ namespace DotsGame
                     UndoMove(d);
                     d.CountBlockedDots = result_last_move;
                     happy_dots.Add(d);
-                    //return d;
+                    break;
                 }
                 UndoMove(d);
             }
@@ -2320,15 +2329,19 @@ namespace DotsGame
         private List<Dot> CheckPatternMove(int Owner)
         {
             var qry = from Dot d1 in this
-                      where d1.Own == Owner
+                      where d1.Own == Owner && !d1.Blocked
                       from Dot d2 in this
-                      where Distance(d1, d2) >= 2 && Distance(d1, d2) < 3
-                      from Dot d in this
-                      where d.ValidMove & Distance(d, d1) < 2 
-                      && d.ValidMove & Distance(d, d2) < 2
-                      select d;
+                      where d2.Own == Owner && !d2.Blocked
+                              && d2.IndexRelation!=d1.IndexRelation 
+                              && Distance(d1, d2) >= 2
+                              && Distance(d1, d2) < 3
+                      from Dot dm in this
+                      where dm.ValidMove & Distance(dm, d1) < 2 
+                      && dm.ValidMove & Distance(dm, d2) < 2
+                      select dm;
             return qry.Distinct(new DotEq()).ToList();
         }
+
         /// <summary>
         /// проверка хода на гарантированное окружение(когда точки находятся через две клетки) 
         /// </summary>
@@ -3138,8 +3151,6 @@ namespace DotsGame
             throw new NotImplementedException();
         }
 
-
-
         //IEnumerable
         public object Current
         {
@@ -3161,58 +3172,6 @@ namespace DotsGame
                 throw new NotImplementedException();
             }
         }
-
-        //public int RowCount
-        //{
-        //    get
-        //    {
-        //        throw new NotImplementedException();
-        //    }
-
-        //    set
-        //    {
-        //        throw new NotImplementedException();
-        //    }
-        //}
-
-        //public int ColumnCount
-        //{
-        //    get
-        //    {
-        //        throw new NotImplementedException();
-        //    }
-
-        //    set
-        //    {
-        //        throw new NotImplementedException();
-        //    }
-        //}
-
-        public IList<Dot> Moves
-        {
-            get
-            {
-                throw new NotImplementedException();
-            }
-
-            set
-            {
-                throw new NotImplementedException();
-            }
-        }
-
-        //public IList<Dot> MoveStack
-        //{
-        //    get
-        //    {
-        //        throw new NotImplementedException();
-        //    }
-
-        //    set
-        //    {
-        //        throw new NotImplementedException();
-        //    }
-        //}
 
         public State CurrentPlayer
         {
@@ -3237,7 +3196,5 @@ namespace DotsGame
                 throw new NotImplementedException();
             }
         }
-
-
     }
 }

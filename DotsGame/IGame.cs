@@ -1,6 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.Threading;
-using Windows.Foundation;
+//using Windows.Foundation;
 
 namespace DotsGame
 {
@@ -9,7 +9,6 @@ namespace DotsGame
         IList<Dot> Dots { get; set; }
         int BoardWidth { get; set; }
         int BoardHeight { get; set; }
-        IList<Dot> Moves { get; set; }
         IList<Dot> ListMoves { get; set; }
         State CurrentPlayer { get; }
         State CurrentOpponent { get; }

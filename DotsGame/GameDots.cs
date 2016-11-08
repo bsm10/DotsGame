@@ -426,22 +426,32 @@ namespace DotsGame
         private void RescanBlockedDots()
         {
             //-------------------Rescan Blocked Dots------------------
-            var dots_bl = from Dot d in Dots
-                          where d.BlokingDots.Count > 0
-                          select d.Blocked = true;
+            List<Dot> blockedDots = new List<Dot>();
+            foreach (Dot d in (from Dot d in Dots
+            where d.BlokingDots.Count > 0
+            select d))
+            {
+                blockedDots.AddRange(d.BlokingDots);
+            }
+            foreach (Dot d in blockedDots) d.Blocked = true;
 
-            //-------------------Rescan Blocked EmptyDots---------------------
+            //var dots_bl = from Dot d in Dots
+            //              where d.BlokingDots.Count > 0
+            //              select d;
 
-            while ((from Dot d in Dots
-                where d.Own == 0 && d.Blocked == false &&
-                      d.x + 1 < BoardWidth && d.x - 1 > - 1 &&
-                      d.y + 1 < BoardHeight && d.y - 1 > - 1 &&
-                      this[d.x + 1, d.y].Blocked |
-                      this[d.x - 1, d.y].Blocked |
-                      this[d.x, d.y + 1].Blocked |
-                      this[d.x, d.y - 1].Blocked
-                select d.Blocked = true).Count()!=0);
+            ////-------------------Rescan Blocked EmptyDots---------------------
+
+            //while ((from Dot d in Dots
+            //        where d.Own == 0 && d.Blocked == false &&
+            //              d.x + 1 < BoardWidth && d.x - 1 > -1 &&
+            //              d.y + 1 < BoardHeight && d.y - 1 > -1 &&
+            //              this[d.x + 1, d.y].Blocked |
+            //              this[d.x - 1, d.y].Blocked |
+            //              this[d.x, d.y + 1].Blocked |
+            //              this[d.x, d.y - 1].Blocked
+            //        select d.Blocked = true).Count() != 0) ;
         }
+
         /// <summary>
         /// проверяет заблокирована ли точка. Перед использованием функции надо установить flg_own
         /// </summary>
@@ -464,6 +474,7 @@ namespace DotsGame
                 {
                     return true;
                 }
+                else return false;
 
             }
             //----------------------------------------------------------------------------------

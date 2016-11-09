@@ -435,9 +435,6 @@ namespace DotsGame
             }
             foreach (Dot d in blockedDots) d.Blocked = true;
 
-            //var dots_bl = from Dot d in Dots
-            //              where d.BlokingDots.Count > 0
-            //              select d;
 
             ////-------------------Rescan Blocked EmptyDots---------------------
 

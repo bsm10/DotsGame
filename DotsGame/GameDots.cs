@@ -255,7 +255,7 @@ namespace DotsGame
         }
         private float Distance(Dot dot1, Dot dot2)//расстояние между точками
         {
-            return (float)Math.Sqrt(Math.Pow((dot1.x -dot2.x), 2) + Math.Pow((dot1.y -dot2.y), 2));
+            return (float)Math.Round(Math.Sqrt(Math.Pow((dot1.x -dot2.x), 2) + Math.Pow((dot1.y -dot2.y), 2)),1);
         }
         /// <summary>
         /// возвращает список соседних точек заданной точки
@@ -272,7 +272,7 @@ namespace DotsGame
                                     };
             return dts.ToList();
         }
-        private List<Dot> NeiborDotsAll(Dot dot)
+        private List<Dot> NeiborDots(Dot dot)
         {
             Dot[] dts = new Dot[8] {
                                     this[dot.x + 1, dot.y],
@@ -617,6 +617,8 @@ namespace DotsGame
             }
             return res;
         }
+
+
         /// <summary>
         /// проверяет блокировку точек, маркирует точки которые блокируют, возвращает количество окруженных точек
         /// </summary>
@@ -666,7 +668,6 @@ namespace DotsGame
                 }
             }
             RescanBlockedDots();
-
             if (lst_blocked_dots.Count == 0) win_player = 0;
             return lst_blocked_dots.Count;
         }
@@ -702,19 +703,20 @@ namespace DotsGame
         private void MarkDotsInRegion(Dot blocked_dot, int flg_own)
         {
             blocked_dot.Marked = true;
-            Dot[] dts = new Dot[4] {
-                                    this[blocked_dot.x + 1, blocked_dot.y],
-                                    this[blocked_dot.x -1, blocked_dot.y],
-                                    this[blocked_dot.x, blocked_dot.y + 1],
-                                    this[blocked_dot.x, blocked_dot.y -1],
-                                    };
+            //Dot[] dts = new Dot[4] {
+            //                        this[blocked_dot.x + 1, blocked_dot.y],
+            //                        this[blocked_dot.x -1, blocked_dot.y],
+            //                        this[blocked_dot.x, blocked_dot.y + 1],
+            //                        this[blocked_dot.x, blocked_dot.y -1],
+            //                        };
+            
             //добавим точки которые попали в окружение
             if (lst_blocked_dots.Contains(blocked_dot) == false)
             {
                 lst_blocked_dots.Add(blocked_dot);
             }
-            foreach (Dot _d in dts)
-            //foreach (Dot _d in this.SetNeiborDotsSNWE(blocked_dot))
+            //foreach (Dot _d in dts)
+            foreach (Dot _d in NeiborDotsSNWE(blocked_dot))
             {
                 if (_d.Own != 0 & _d.Blocked == false & _d.Own != flg_own)//_d-точка которая окружает
                 {
@@ -1039,15 +1041,32 @@ namespace DotsGame
             return x.Count() > 0 ? x.First() : null;
 
         }
+
+        private Dot ОбщаяТочкаSNWE(Dot d1, Dot d2)//*1d1* 
+        {
+            return NeiborDotsSNWE(d1).Intersect(NeiborDotsSNWE(d2), new DotEq()).FirstOrDefault();
+        }
+        private List<Dot> ОбщаяТочка(Dot d1, Dot d2)
+        {
+            return NeiborDots(d1).Intersect(NeiborDots(d2), new DotEq()).ToList();
+        }
         private Dot CheckMove(int Owner)
         {
             List<Dot> happy_dots = new List<Dot>();
             var qry = from Dot d1 in this
                       where d1.Own == Owner
                       from Dot d2 in this
-                      where d2.IndexRelation == d1.IndexRelation && Distance(d1,d2)>=2 & Distance(d1, d2)<3
+                      where
+                            d2.IndexRelation == d1.IndexRelation
+                            && Distance(d1, d2) > 2
+                            && Distance(d1, d2) < 3
+                            && ОбщаяТочка(d1, d2).Where(dt => dt.Own == Owner).Count() == 0
+                            ||
+                            d2.IndexRelation == d1.IndexRelation
+                            && Distance(d1, d2) == 2
                       from Dot d in this
-                      where d.ValidMove & Distance(d, d1) < 2 & Distance(d, d2) < 2
+                      where d.ValidMove && Distance(d, d1) < 2 && Distance(d, d2) < 2 
+                                && NeiborDotsSNWE(d).Where(dt=>dt.Own==Owner).Count() <= 2
                       select d;
             
             foreach (Dot d in qry.Distinct(new DotEq()).ToList())
@@ -1063,7 +1082,7 @@ namespace DotsGame
                     UndoMove(d);
                     d.CountBlockedDots = result_last_move;
                     happy_dots.Add(d);
-                    break;
+                    //break;
                 }
                 UndoMove(d);
             }
@@ -1084,7 +1103,7 @@ namespace DotsGame
             {
                 foreach (Dot d in qry)
                 {
-                    foreach (Dot dot_move in NeiborDotsAll(d))
+                    foreach (Dot dot_move in NeiborDots(d))
                     {
                         if (dot_move.ValidMove)
                         {

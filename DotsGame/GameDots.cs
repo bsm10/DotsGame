@@ -2812,6 +2812,8 @@ namespace DotsGame
             List<Dot> lst_best_move = new List<Dot>();//сюда заносим лучшие ходы
             if (recursion_depth==1)counter_moves = 1;
             recursion_depth++;
+            counter_moves++;
+
             if (recursion_depth > MAX_RECURSION) return PLAYER_NONE;
             //if (counter_moves > MAX_COUNTMOVES) return PLAYER_NONE;
 
@@ -2838,7 +2840,7 @@ namespace DotsGame
             if(lst_best_move.Count>0)
             {
 #region Cycle
-                foreach (Dot move in lst_best_move)
+                foreach (Dot move in lst_best_move.Where(dt=>dt.Rating<2))
                 {
                     #region ходит комп в проверяемые точки
                     player2 = player1 == PLAYER_HUMAN ? PLAYER_COMPUTER : PLAYER_HUMAN;
@@ -2847,7 +2849,8 @@ namespace DotsGame
                     res_last_move = MakeMove(move,player2);
                     lst_moves.Add(move);
                     counter_moves++;
-#region проверка на окружение
+
+                    #region проверка на окружение
 
                     if (win_player == PLAYER_COMPUTER)
                     {

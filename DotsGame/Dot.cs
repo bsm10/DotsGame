@@ -216,7 +216,7 @@ namespace DotsGame
         }
         public bool Marked { get; set; }
 
-        public string _Tag = string.Empty;
+        private string _Tag = string.Empty;
         public string Tag
         {
             get
@@ -228,7 +228,7 @@ namespace DotsGame
                 _Tag = value;
             }
         }
-        public int _IndexDot;
+        private int _IndexDot;
         public int IndexDot
         {
             get
@@ -294,7 +294,7 @@ namespace DotsGame
             if (Own == 1) s = " Player";
             else if (Own == 2) s = " Computer";
             else s = " None";
-            s = Blocked ? x + ":" + y + s + " Blocked" : x + ":" + y + s + " Rating: " + Rating;
+            s = Blocked ? x + ":" + y + s + " Blocked" : x + ":" + y + s + " Rating: " + Rating + "; " + Tag;
             return s;
         }
         public bool Equals(Dot dot)//Проверяет равенство точек по координатам - это для реализации  IEquatable<Dot>

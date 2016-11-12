@@ -1131,6 +1131,32 @@ namespace DotsGame
             return null;
         }
         private int iNumberPattern;
+        // * *
+        // + m +
+        private List<Dot> Проверка1(int Owner) 
+        {
+            var qry = from Dot d1 in Board_NotEmptyNonBlockedDots.Where(dt => dt.Own == Owner)
+                      where d1.Own == Owner && !d1.Blocked
+                      from Dot d2 in Board_NotEmptyNonBlockedDots.Where(dt => dt.Own == Owner)
+                      where d2.Own == Owner && !d2.Blocked
+                              && Distance(d1, d2) == 1
+                      from Dot de1 in Board_NotEmptyNonBlockedDots.Where(dt => dt.Own != Owner)
+                      where de1.Own != Owner && Distance(de1, d1) == 1
+                            && Distance(de1, d2) == 1.4f
+                      from Dot de2 in Board_NotEmptyNonBlockedDots.Where(dt => dt.Own != Owner)
+                      where de1.Own != Owner && Distance(de2, d2) == 1.4f
+                            && Distance(de2, de1) == 2
+                      from Dot dm in EmptyNeibourDots(Owner)
+                      where dm.ValidMove && Distance(dm, d1) == 1.4f
+                            && Distance(dm, d2) == 1
+                            && Distance(dm, de1) == 1
+                            && Distance(dm, de2) == 1
+                      select dm;
+            List<Dot> ld = qry.Distinct(new DotEq()).ToList();
+            foreach (Dot d in ld) d.Tag = "Проверка1(" + Owner + ")";
+            return ld;
+        }
+
         private Dot CheckPattern_vilochka(int Owner)
         {
             int enemy_own = Owner == 1 ? 2 : 1;
@@ -2353,6 +2379,7 @@ namespace DotsGame
             //=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
             return null;//если никаких паттернов не найдено возвращаем нуль
         }
+
         private List<Dot> CheckPatternMove(int Owner)
         {
             var qry = from Dot d1 in this
@@ -2402,9 +2429,7 @@ namespace DotsGame
                       from Dot de2 in EmptyNeibourDots(Owner)
                       where Distance(d1, de2) < 2 && Distance(de1, de2) == 1
                       from Dot de3 in EmptyNeibourDots(Owner)
-                      where  Distance(de3, d2)  < 2 
-                             && Distance(de3, de1) < 2
-                             //&& ОбщаяТочка(de3, d1).Where(dt=>dt.Own==0).Count() < 2
+                      where  Distance(de3, d2)  < 2 && Distance(de3, de1) < 2
                       select new Dot(de3.x, de3.y, NumberPattern: 777, Rating: 1);
 
             }
@@ -2725,7 +2750,10 @@ namespace DotsGame
             #endregion
             #endregion
             #region CheckPattern
+            ld_bm = Проверка1(pl2);
+            if (ld_bm.Count > 0) moves.AddRange(ld_bm);
 
+            
 //            foreach (Dot dt in CheckPattern(pl2))
 //            {
 //                if (DotIndexCheck(dt))

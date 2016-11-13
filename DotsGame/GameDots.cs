@@ -2398,6 +2398,23 @@ namespace DotsGame
             return ld;
         }
 
+        private List<Dot> EmptyDotsBetween(Dot d1, Dot d2)
+        {
+            //int dx, dy;
+            List<Dot> ld = new List<Dot>();
+            if (d1.x - d2.x != 0 && d1.y - d2.y != 0)
+            {
+                //уравнение прямой (x - x1) / (x2 - x1) = (y - y1) / (y2 - y1)
+                var dots = from Dot d in Board_ValidMoves
+                           where Math.Abs((d.x - d1.x) / (d2.x - d1.x)) == Math.Abs((d.y - d1.y) / (d2.y - d1.y)) 
+                           && d.x >= d1.x && d.x <= d2.x
+                           && d.y <= d1.y && d.y >= d2.y
+                           select d;
+                ld = dots.ToList();
+            }
+            return ld;
+        }
+
         /// <summary>
         /// проверка хода на гарантированное окружение(когда точки находятся через две клетки) 
         /// </summary>
@@ -2409,44 +2426,70 @@ namespace DotsGame
             if (IndexRelation)
             {
                 qry = from Dot d1 in this
-                          //where d1.Own == Owner && !d1.Blocked
-                          //from Dot d2 in this
-                          //where d2.IndexRelation == d1.IndexRelation && !d2.Blocked && Distance(d1, d2) < 3.5f & Distance(d1, d2) >= 3f
-                          //from Dot de1 in this
-                          //where de1.ValidMove & Distance(d1, de1) == 1
-                          //from Dot de2 in this
-                          //where de2.ValidMove & Distance(de1, de2) == 1 & Distance(d1, de2) < 2
-                          //from Dot de3 in this
-                          //where de3.ValidMove & Distance(d2, de3) < 2 & Distance(de2, de3) == 1
-                          //   || de3.ValidMove & Distance(d2, de3) < 2 & Distance(de1, de3) == 1
 
-                          //select new Dot(de3.x, de3.y, NumberPattern: 777, Rating: 1);
                       where d1.Own == Owner && !d1.Blocked
                       from Dot d2 in this
                       where d2.IndexRelation == d1.IndexRelation && !d2.Blocked && Distance(d1, d2) < 3.5f & Distance(d1, d2) >= 3f
-                      from Dot de1 in EmptyNeibourDots(Owner)
-                      where Distance(d1, de1) == 1
-                      from Dot de2 in EmptyNeibourDots(Owner)
-                      where Distance(d1, de2) < 2 && Distance(de1, de2) == 1
-                      from Dot de3 in EmptyNeibourDots(Owner)
-                      where  Distance(de3, d2)  < 2 && Distance(de3, de1) < 2
+                      from Dot de1 in this
+                      where de1.ValidMove & Distance(d1, de1) == 1
+                      from Dot de2 in this
+                      where de2.ValidMove & Distance(d1, de2) == 1.4f
+                      from Dot de3 in this
+                      where de3.ValidMove & Distance(d2, de3) < 2 && Distance(d2, de3) < 3.5f
+                            && Distance(de1, de3) < 2 && Distance(de1, de2) < 2
                       select new Dot(de3.x, de3.y, NumberPattern: 777, Rating: 1);
+
+
+                //where d1.Own == Owner && !d1.Blocked
+                //from Dot d2 in this
+                //where d2.IndexRelation == d1.IndexRelation && !d2.Blocked && Distance(d1, d2) < 3.5f & Distance(d1, d2) >= 3f
+                //from Dot de1 in this
+                //where de1.ValidMove & Distance(d1, de1) == 1
+                //from Dot de2 in this
+                //where de2.ValidMove & Distance(de1, de2) == 1 & Distance(d1, de2) < 2
+                //from Dot de3 in this
+                //where de3.ValidMove & Distance(d2, de3) < 2 & Distance(de2, de3) == 1
+                //   || de3.ValidMove & Distance(d2, de3) < 2 & Distance(de1, de3) == 1
+                //select new Dot(de3.x, de3.y, NumberPattern: 777, Rating: 1);
+
+                //where d1.Own == Owner && !d1.Blocked
+                //from Dot d2 in this
+                //where d2.IndexRelation == d1.IndexRelation && !d2.Blocked && Distance(d1, d2) < 3.5f & Distance(d1, d2) >= 3f
+                ////from Dot de1 in this //EmptyNeibourDots(Owner)
+                ////where de1.ValidMove && Distance(d1, de1) == 1 && Distance(d2, de1) < 2.5f
+                ////from Dot de2 in this//EmptyNeibourDots(Owner)
+                ////where de2.ValidMove && Distance(d1, de2) ==1.4f && Distance(de1, de2) == 1
+                //from Dot de3 in EmptyNeibourDots(Owner)
+                //where EmptyDotsBetween(d1,d2).Contains(de3) //Distance(de3, d2)  < 2 && Distance(de3, de1) < 2
+                //select new Dot(de3.x, de3.y, NumberPattern: 777, Rating: 1);
 
             }
             else
             {
                 qry = from Dot d1 in this
-                          where d1.Own == Owner && !d1.Blocked
-                          from Dot d2 in this
-                          where d2.Own == Owner && !d2.Blocked && Distance(d1, d2) < 3.5f & Distance(d1, d2) >= 3
-                          from Dot de1 in this
-                          where de1.ValidMove & Distance(d1, de1) == 1
-                          from Dot de2 in this
-                          where de2.ValidMove & Distance(de1, de2) == 1 & Distance(d1, de2) < 2
-                          from Dot de3 in this
-                          where de3.ValidMove & Distance(d2, de3) < 2 & Distance(de2, de3) == 1
-                             || de3.ValidMove & Distance(d2, de3) < 2 & Distance(de1, de3) == 1
-                          select de3;
+                      where d1.Own == Owner && !d1.Blocked
+                      from Dot d2 in this
+                      where d2.Own == Owner && !d2.Blocked && Distance(d1, d2) < 3.5f & Distance(d1, d2) >= 3
+                      from Dot de1 in this
+                      where de1.ValidMove & Distance(d1, de1) == 1
+                      from Dot de2 in this
+                      where de2.ValidMove & Distance(d1, de2) == 1.4f
+                      from Dot de3 in this
+                      where de3.ValidMove & Distance(d2, de3) < 2 && Distance(d2, de3) < 3.5f
+                            && Distance(de1, de3) < 2 && Distance(de1, de2) < 2
+                      select new Dot(de3.x, de3.y, NumberPattern: 777, Rating: 1);
+
+                //from Dot de1 in this
+                //where de1.ValidMove & Distance(d1, de1) == 1
+                //from Dot de2 in this
+                //where de2.ValidMove & Distance(de1, de2) == 1 & Distance(d1, de2) < 2
+                //from Dot de3 in this
+                //where de3.ValidMove & Distance(d2, de3) < 2 & Distance(de2, de3) == 1
+                //   || de3.ValidMove & Distance(d2, de3) < 2 & Distance(de1, de3) == 1
+
+                //from Dot de3 in EmptyNeibourDots(Owner)
+                //where EmptyDotsBetween(d1, d2).Contains(de3) //Distance(de3, d2)  < 2 && Distance(de3, de1) < 2
+                //select de3;
 
             }
             List<Dot> ld = qry.Distinct(new DotEq()).ToList();
@@ -2659,7 +2702,7 @@ namespace DotsGame
 #region CheckPattern_vilochka
             bm = CheckPattern_vilochka(pl2);
             //if (bm != null)
-            if (DotIndexCheck(bm))
+            if (DotIndexCheck(bm) && CheckDot(bm, pl2) == false)
             {
 #region DEBUG
 #if DEBUG
@@ -2675,7 +2718,7 @@ namespace DotsGame
 
             bm = CheckPattern_vilochka(pl1);
             // if (bm != null)
-            if (DotIndexCheck(bm))
+            if (DotIndexCheck(bm) && CheckDot(bm, pl1) == false)
             {
 #region DEBUG
 #if DEBUG
@@ -2713,6 +2756,7 @@ namespace DotsGame
             ld_bm.AddRange(CheckPatternVilka2x2(pl1, true));
             ld_bm.AddRange(CheckPatternVilka2x2(pl1, false));
             if (ld_bm.Count > 0)moves.AddRange(ld_bm);
+            
             #region DEBUG
 #if DEBUG
             sW2.Stop();
@@ -2843,11 +2887,10 @@ namespace DotsGame
             counter_moves++;
 
             if (recursion_depth > MAX_RECURSION) return PLAYER_NONE;
-            //if (counter_moves > MAX_COUNTMOVES) return PLAYER_NONE;
 
             lst_best_move = BestMove(player1, player2);
             foreach (Dot d in lst_best_move) d.Rating += counter_moves;
-            tempmove = lst_best_move.Where(dt => dt.iNumberPattern == 777 & dt.Rating == 0
+            tempmove = lst_best_move.Where(dt => dt.iNumberPattern == 777 & dt.Rating == 1
                                                | dt.iNumberPattern == 666 & dt.Rating == lst_best_move.Min(d => d.Rating)).ElementAtOrDefault(0);
 
             //если есть паттерн на окружение противника тоже устанавливается бест мув
@@ -2865,104 +2908,89 @@ namespace DotsGame
                 return PLAYER_HUMAN;
             }
 
-            if(lst_best_move.Count>0)
-            {
-#region Cycle
-                foreach (Dot move in lst_best_move.Where(dt=>dt.Rating<2))
-                {
-                    #region ходит комп в проверяемые точки
-                    player2 = player1 == PLAYER_HUMAN ? PLAYER_COMPUTER : PLAYER_HUMAN;
-                    if (counter_moves > MAX_COUNTMOVES) break;
-                    //**************делаем ход***********************************
-                    res_last_move = MakeMove(move,player2);
-                    lst_moves.Add(move);
-                    counter_moves++;
+            //            if(lst_best_move.Count>0)
+            //            {
+            //#region Cycle
+            //                foreach (Dot move in lst_best_move.Where(dt=>dt.Rating<2))
+            //                {
+            //                    #region ходит комп в проверяемые точки
+            //                    player2 = player1 == PLAYER_HUMAN ? PLAYER_COMPUTER : PLAYER_HUMAN;
+            //                    if (counter_moves > MAX_COUNTMOVES) break;
+            //                    //**************делаем ход***********************************
+            //                    res_last_move = MakeMove(move,player2);
+            //                    lst_moves.Add(move);
+            //                    counter_moves++;
 
-                    #region проверка на окружение
+            //                    #region проверка на окружение
 
-                    if (win_player == PLAYER_COMPUTER)
-                    {
-                        Dot dt_move = lst_moves.First();
-                        dt_move.Rating = counter_moves;
-                        lst_branch.Add(dt_move);
-                        UndoMove(move);
-                        continue;
-                        //return PLAYER_COMPUTER;
-                    }
-                    //если ход в заведомо окруженный регион - пропускаем такой ход
-                    if (win_player == PLAYER_HUMAN)
-                    {
-                        UndoMove(move);
-                        continue;
-                    }
-                    #endregion
-                    #region Debug statistic
-#if DEBUG
-                    DebugInfo.lstDBG1.Add(move);//(move.Own + " -" + move.x + ":" + move.y);
-                    DebugInfo.textDBG = "Ходов проверено: " + counter_moves +
-                                       "\r\n проверка вокруг точки " + LastMove +
-                                       "\r\n время поиска " + stopWatch.ElapsedMilliseconds;
-#endif
-#endregion
-                    //теперь ходит другой игрок ===========================================================================
+            //                    if (win_player == PLAYER_COMPUTER)
+            //                    {
+            //                        Dot dt_move = lst_moves.First();
+            //                        dt_move.Rating = counter_moves;
+            //                        lst_branch.Add(dt_move);
+            //                        UndoMove(move);
+            //                        continue;
+            //                        //return PLAYER_COMPUTER;
+            //                    }
+            //                    //если ход в заведомо окруженный регион - пропускаем такой ход
+            //                    if (win_player == PLAYER_HUMAN)
+            //                    {
+            //                        UndoMove(move);
+            //                        continue;
+            //                    }
+            //                    #endregion
+            //                    #region Debug statistic
+            //#if DEBUG
+            //                    DebugInfo.lstDBG1.Add(move);//(move.Own + " -" + move.x + ":" + move.y);
+            //                    DebugInfo.textDBG = "Ходов проверено: " + counter_moves +
+            //                                       "\r\n проверка вокруг точки " + LastMove +
+            //                                       "\r\n время поиска " + stopWatch.ElapsedMilliseconds;
+            //#endif
+            //#endregion
+            //                    //теперь ходит другой игрок ===========================================================================
 
-                    int result = Play(player2, player1);
+            //                    int result = Play(player2, player1);
 
-                    recursion_depth--;
+            //                    recursion_depth--;
 
-                     if (result == 0)
-                    {
-                        lst_moves.Remove(move);
-#if DEBUG
-                        DebugInfo.lstDBG1.Remove(move);
-#endif
-                        UndoMove(move);
-                        continue;
-                    }
-                    else if (result == PLAYER_COMPUTER)
-                    {
-                        if (recursion_depth == 1)
-                        {
-                            lst_moves[0].Rating = counter_moves;
-                            lst_branch.Add(lst_moves[0]);
-                        }
-                        
-                        lst_moves.Remove(move);
-#if DEBUG
-                        DebugInfo.lstDBG1.Remove(move);
-#endif
-                        UndoMove(move);
-                        return result;
-                    }
-                    else if (result == PLAYER_HUMAN)
-                    {
-                        if (recursion_depth == 2)
-                        {
-                            lst_moves[0].Rating = counter_moves;//такой рейтинг устанавливается если выигрывает человек
-                            lst_branch.Add(lst_moves[0]);
-                        }
-                        lst_moves.Remove(move);
-#if DEBUG
-                        DebugInfo.lstDBG1.Remove(move);
-#endif
+            //                     if (result == 0)
+            //                    {
+            //                        lst_moves.Remove(move);
+            //                        DebugInfo.lstDBG1.Remove(move);
+            //                        UndoMove(move);
+            //                        continue;
+            //                    }
+            //                    else if (result == PLAYER_COMPUTER)
+            //                    {
+            //                        if (recursion_depth == 1)
+            //                        {
+            //                            lst_moves[0].Rating = counter_moves;
+            //                            lst_branch.Add(lst_moves[0]);
+            //                        }
 
-                        UndoMove(move);
-                        return result;
-                    }
-
-
-#region Debug
-#if DEBUG
-//remove from list
-                    if (DebugInfo.lstDBG1.Count > 0) DebugInfo.lstDBG1.RemoveAt(DebugInfo.lstDBG1.Count - 1);
-#endif
-#endregion
-                }
-          #endregion     
-            }
-#endregion
-            best_move = lst_best_move.Where(dt => dt.Rating == lst_best_move.Min(d => d.Rating)).ElementAtOrDefault(0);
-           
+            //                        lst_moves.Remove(move);
+            //                        DebugInfo.lstDBG1.Remove(move);
+            //                        UndoMove(move);
+            //                        return result;
+            //                    }
+            //                    else if (result == PLAYER_HUMAN)
+            //                    {
+            //                        if (recursion_depth == 2)
+            //                        {
+            //                            lst_moves[0].Rating = counter_moves;//такой рейтинг устанавливается если выигрывает человек
+            //                            lst_branch.Add(lst_moves[0]);
+            //                        }
+            //                        lst_moves.Remove(move);
+            //                        DebugInfo.lstDBG1.Remove(move);
+            //                        UndoMove(move);
+            //                        return result;
+            //                    }
+            //                    if (DebugInfo.lstDBG1.Count > 0) DebugInfo.lstDBG1.RemoveAt(DebugInfo.lstDBG1.Count - 1);
+            //                }
+            //            #endregion     
+            //            }
+            //            best_move = lst_best_move.Where(dt => dt.Rating == lst_best_move.Min(d => d.Rating)).ElementAtOrDefault(0);
+            lst_branch = lst_best_move;
             return PLAYER_NONE;
         }//----------------------------Play-----------------------------------------------------
 

@@ -494,11 +494,6 @@ namespace DotsGame
         private void RebuildDots()
         {
             GameDots _Dots = new GameDots(BoardWidth,BoardHeight);
-
-            //foreach (Dot dot in ListMoves)
-            //{
-            //    _Dots.MakeMove(dot, dot.Own, addForDraw: true);
-            //}
             foreach (Dot dot in stackMoves)
             {
                 if(ListMoves.Contains(dot))_Dots.MakeMove(dot, dot.Own, addForDraw: true);
@@ -606,7 +601,6 @@ namespace DotsGame
             else return -1;//в случае невозможного хода
             //--------------------------------
             int res = CheckBlocked(dot.Own);
-            //int res = CheckBlocked2(dot.Own);
             //--------------------------------
             count_blocked_dots = (from Dot d in Dots where d.Blocked select d).Count();
             if (addForDraw)
@@ -637,7 +631,6 @@ namespace DotsGame
             {
                 UnmarkAllDots();
                 if (DotIsFree(d, d.Own) == false)
-                //if (DotIsFree(d, arrDots) == false)
                 {
                     if (d.Own != 0) d.Blocked = true;
                     d.IndexRelation = 0;
@@ -671,6 +664,12 @@ namespace DotsGame
             if (lst_blocked_dots.Count == 0) win_player = 0;
             return lst_blocked_dots.Count;
         }
+
+        /// <summary>
+        /// Возвращает количество блокированных точек
+        /// </summary>
+        /// <param name="Owner">владелец блокированных точек</param>
+        /// <returns></returns>
         private int CheckBlocked2(int Owner)
         {
             var checkdots = from Dot d in this
@@ -689,7 +688,6 @@ namespace DotsGame
 
 
             return lst_blocked_dots.Count;
-            //if (blocking_dots.Count() > 0) foreach (Dot d in blocking_dots) d.Blocked = true;
         }
 
 
@@ -1057,12 +1055,14 @@ namespace DotsGame
                       where d1.Own == Owner
                       from Dot d2 in this
                       where
-                            d2.IndexRelation == d1.IndexRelation
+                            d2.Own == Owner
+                            && d2.IndexRelation == d1.IndexRelation
                             && Distance(d1, d2) > 2
                             && Distance(d1, d2) < 3
                             && ОбщаяТочка(d1, d2).Where(dt => dt.Own == Owner).Count() == 0
                             ||
-                            d2.IndexRelation == d1.IndexRelation
+                            d2.Own == Owner
+                            && d2.IndexRelation == d1.IndexRelation
                             && Distance(d1, d2) == 2
                       from Dot d in this
                       where d.ValidMove && Distance(d, d1) < 2 && Distance(d, d2) < 2 
@@ -2429,39 +2429,18 @@ namespace DotsGame
 
                       where d1.Own == Owner && !d1.Blocked
                       from Dot d2 in this
-                      where d2.IndexRelation == d1.IndexRelation && !d2.Blocked && Distance(d1, d2) < 3.5f & Distance(d1, d2) >= 3f
+                      where d2.Own == Owner && d2.IndexRelation == d1.IndexRelation && !d2.Blocked && Distance(d1, d2) < 3.5f & Distance(d1, d2) >= 3f
                       from Dot de1 in this
                       where de1.ValidMove & Distance(d1, de1) == 1
                       from Dot de2 in this
                       where de2.ValidMove & Distance(d1, de2) == 1.4f
                       from Dot de3 in this
-                      where de3.ValidMove & Distance(d2, de3) < 2 && Distance(d2, de3) < 3.5f
-                            && Distance(de1, de3) < 2 && Distance(de1, de2) < 2
+                      where de3.ValidMove && Distance(d2, de3) < 2
+                                          && Distance(d2, de3) < 3.5f
+                                          && Distance(de1, de3) < 2 && Distance(de1, de2) < 2
+                                          && NeiborDotsSNWE(de3).Where(dt => dt.Own == Owner).Count() <= 1
                       select new Dot(de3.x, de3.y, NumberPattern: 777, Rating: 1);
 
-
-                //where d1.Own == Owner && !d1.Blocked
-                //from Dot d2 in this
-                //where d2.IndexRelation == d1.IndexRelation && !d2.Blocked && Distance(d1, d2) < 3.5f & Distance(d1, d2) >= 3f
-                //from Dot de1 in this
-                //where de1.ValidMove & Distance(d1, de1) == 1
-                //from Dot de2 in this
-                //where de2.ValidMove & Distance(de1, de2) == 1 & Distance(d1, de2) < 2
-                //from Dot de3 in this
-                //where de3.ValidMove & Distance(d2, de3) < 2 & Distance(de2, de3) == 1
-                //   || de3.ValidMove & Distance(d2, de3) < 2 & Distance(de1, de3) == 1
-                //select new Dot(de3.x, de3.y, NumberPattern: 777, Rating: 1);
-
-                //where d1.Own == Owner && !d1.Blocked
-                //from Dot d2 in this
-                //where d2.IndexRelation == d1.IndexRelation && !d2.Blocked && Distance(d1, d2) < 3.5f & Distance(d1, d2) >= 3f
-                ////from Dot de1 in this //EmptyNeibourDots(Owner)
-                ////where de1.ValidMove && Distance(d1, de1) == 1 && Distance(d2, de1) < 2.5f
-                ////from Dot de2 in this//EmptyNeibourDots(Owner)
-                ////where de2.ValidMove && Distance(d1, de2) ==1.4f && Distance(de1, de2) == 1
-                //from Dot de3 in EmptyNeibourDots(Owner)
-                //where EmptyDotsBetween(d1,d2).Contains(de3) //Distance(de3, d2)  < 2 && Distance(de3, de1) < 2
-                //select new Dot(de3.x, de3.y, NumberPattern: 777, Rating: 1);
 
             }
             else
@@ -2475,21 +2454,12 @@ namespace DotsGame
                       from Dot de2 in this
                       where de2.ValidMove & Distance(d1, de2) == 1.4f
                       from Dot de3 in this
-                      where de3.ValidMove & Distance(d2, de3) < 2 && Distance(d2, de3) < 3.5f
-                            && Distance(de1, de3) < 2 && Distance(de1, de2) < 2
+                      where de3.ValidMove && Distance(d1, de3) < 2 
+                                          && Distance(d2, de3) < 3.5f
+                                          && Distance(de1, de3) < 2
+                                          && Distance(de1, de2) < 2
+                                          && NeiborDotsSNWE(de3).Where(dt=>dt.Own==Owner).Count()<=1
                       select new Dot(de3.x, de3.y, NumberPattern: 777, Rating: 1);
-
-                //from Dot de1 in this
-                //where de1.ValidMove & Distance(d1, de1) == 1
-                //from Dot de2 in this
-                //where de2.ValidMove & Distance(de1, de2) == 1 & Distance(d1, de2) < 2
-                //from Dot de3 in this
-                //where de3.ValidMove & Distance(d2, de3) < 2 & Distance(de2, de3) == 1
-                //   || de3.ValidMove & Distance(d2, de3) < 2 & Distance(de1, de3) == 1
-
-                //from Dot de3 in EmptyNeibourDots(Owner)
-                //where EmptyDotsBetween(d1, d2).Contains(de3) //Distance(de3, d2)  < 2 && Distance(de3, de1) < 2
-                //select de3;
 
             }
             List<Dot> ld = qry.Distinct(new DotEq()).ToList();

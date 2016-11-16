@@ -14,7 +14,7 @@ namespace DotsGame
         public static string textDBG1 = string.Empty; 
         public static List<Dot> lstDBG1 = new List<Dot>();
         public static List<string> lstDBG2 = new List<string>();
-        
+
     }
 
     public class GameDots : IEnumerator, IEnumerable, IGame
@@ -62,6 +62,7 @@ namespace DotsGame
                 return ListMoves.ToList();
             }
         }
+
         private Dot best_move; //ход который должен сделать комп
         private List<Dot> dots_in_region;//записывает сюда точки, которые окружают точку противника
         private IList<Dot> _Dots; // главная коллекция

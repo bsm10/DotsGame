@@ -1049,6 +1049,12 @@ namespace DotsGame
         {
             return NeiborDots(d1).Intersect(NeiborDots(d2), new DotEq()).ToList();
         }
+        private List<Dot> ОбщиеПустыеТочки(Dot d1, Dot d2)
+        {
+            return NeiborDots(d1).Intersect(NeiborDots(d2), 
+                new DotEq()).Where(dt=>dt.ValidMove).ToList();
+        }
+
         private Dot CheckMove(int Owner)
         {
             List<Dot> happy_dots = new List<Dot>();
@@ -2393,6 +2399,7 @@ namespace DotsGame
                       from Dot dm in this
                       where dm.ValidMove & Distance(dm, d1) < 2 
                       && dm.ValidMove & Distance(dm, d2) < 2
+                      && ОбщиеПустыеТочки(d1, d2).Count==1
                       select dm;
             List<Dot> ld = qry.Distinct(new DotEq()).ToList();
             foreach (Dot d in ld) d.Tag = "CheckPatternMove(" + Owner + ")";

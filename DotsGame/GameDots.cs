@@ -17,7 +17,7 @@ namespace DotsGame
         
     }
 
-    public class GameDots : IEnumerator, IEnumerable, IGame
+    public class GameDots : IEnumerator, IEnumerable//, IGame
     {
         private const int PLAYER_DRAW = -1;
         private const int PLAYER_NONE = 0;
@@ -64,18 +64,7 @@ namespace DotsGame
         }
         private Dot best_move; //ход который должен сделать комп
         private List<Dot> dots_in_region;//записывает сюда точки, которые окружают точку противника
-        private IList<Dot> _Dots; // главная коллекция
-        public IList<Dot> Dots
-        {
-            get
-            {
-                return _Dots;
-            }
-            set
-            {
-                _Dots = value;
-            }
-        }
+        public List<Dot> Dots { get; set; }
         /// <summary>
         /// Возвращает список не занятых точек
         /// </summary>
@@ -83,21 +72,21 @@ namespace DotsGame
         {
             get
             {
-                return (from Dot d in _Dots where d.ValidMove select d).ToList();
+                return (from Dot d in Dots where CheckValidMove(d) select d).ToList();
             }
         }
         private List<Dot> Board_NotEmptyNonBlockedDots
         {
             get
             {
-                return (from Dot d in _Dots where d.Own != 0 && d.Blocked == false select d).ToList();
+                return (from Dot d in Dots where d.Own != 0 && d.Blocked == false select d).ToList();
             }
         }
         private List<Dot> Board_AllNotBlockedDots
         {
             get
             {
-                return _Dots.Where(d=>!d.Blocked).ToList();
+                return Dots.Where(d=>!d.Blocked).ToList();
             }
         }
         private GameDots CopyDots
@@ -107,12 +96,12 @@ namespace DotsGame
                 GameDots ad = new GameDots(BoardWidth,BoardHeight);
                 for (int i = 0; i < Dots.Count; i++)
                 {
-                    ad._Dots[i].Blocked = Dots[i].Blocked;
-                    ad._Dots[i].Fixed = Dots[i].Fixed;
-                    ad._Dots[i].IndexDot = Dots[i].IndexDot;
-                    ad._Dots[i].Own = Dots[i].Own;
-                    ad._Dots[i].x = Dots[i].x;
-                    ad._Dots[i].y = Dots[i].y;
+                    ad.Dots[i].Blocked = Dots[i].Blocked;
+                    ad.Dots[i].Fixed = Dots[i].Fixed;
+                    ad.Dots[i].IndexDot = Dots[i].IndexDot;
+                    ad.Dots[i].Own = Dots[i].Own;
+                    ad.Dots[i].x = Dots[i].x;
+                    ad.Dots[i].y = Dots[i].y;
                 }
                 return ad;
             }
@@ -152,15 +141,15 @@ namespace DotsGame
             int ind;
             BoardHeight = boardheight;
             BoardWidth = boardwidth;
-            _Dots = new List<Dot>(boardwidth * boardheight); // главная коллекция точек
+            Dots = new List<Dot>(boardwidth * boardheight); // главная коллекция точек
             for (int i = 0; i < boardwidth; i++)
             {
                 for (int j = 0; j < boardheight; j++)
                 {
                     ind = IndexDot(i, j);
-                    _Dots.Add(new Dot(i, j));
-                    _Dots[ind].IndexDot = ind;
-                    if (i == 0 | i == (boardwidth - 1) | j == 0 | j == (boardheight - 1)) _Dots[ind].Fixed = true;
+                    Dots.Add(new Dot(i, j));
+                    Dots[ind].IndexDot = ind;
+                    if (i == 0 | i == (boardwidth - 1) | j == 0 | j == (boardheight - 1)) Dots[ind].Fixed = true;
                     counter += 1;
                 }
             }
@@ -188,7 +177,7 @@ namespace DotsGame
         {
             get
             {
-                return _Dots.Count;
+                return Dots.Count;
             }
         }
         public Dot this[int i, int j]//Индексатор возвращает элемент из массива по его индексу
@@ -199,7 +188,7 @@ namespace DotsGame
                 if (j >= BoardHeight) j = BoardHeight - 1;
                 if (i < 0) i = 0;
                 if (j < 0) j = 0;
-                return _Dots[IndexDot(i, j)];
+                return Dots[IndexDot(i, j)];
             }
         }
         private void Add(Dot dot)//добавляет точку в массив
@@ -207,19 +196,19 @@ namespace DotsGame
             int ind = IndexDot(dot.x, dot.y);
             if (DotIndexCheck(dot.x, dot.y))
             {
-                _Dots[ind].Own = dot.Own;
-                if (dot.Own != 0) _Dots[ind].IndexRelation = _Dots[ind].IndexDot;
-                _Dots[ind].Blocked = false;
+                Dots[ind].Own = dot.Own;
+                if (dot.Own != 0) Dots[ind].IndexRelation = Dots[ind].IndexDot;
+                Dots[ind].Blocked = false;
                 if (dot.x == 0 | dot.x == (BoardWidth - 1) | dot.y == 0 | 
-                    dot.y == (BoardHeight - 1)) _Dots[ind].Fixed = true;
-                AddNeibor(_Dots[ind]);
-                stackMoves.Add(_Dots[ind]);
+                    dot.y == (BoardHeight - 1)) Dots[ind].Fixed = true;
+                AddNeibor(Dots[ind]);
+                stackMoves.Add(Dots[ind]);
             }
         }
         private void AddNeibor(Dot dot)
         {
             //выбрать соседние точки, если такие есть
-            var q = from Dot d in _Dots where d.Own == dot.Own & Distance(dot, d) < 2 select d;
+            var q = from Dot d in Dots where d.Own == dot.Own & Distance(dot, d) < 2 select d;
 
             foreach (Dot d in q)
             {
@@ -244,11 +233,11 @@ namespace DotsGame
             int ind = IndexDot(dot.x, dot.y);
             if (DotIndexCheck(dot.x, dot.y))
             {
-                int i = _Dots[ind].IndexDot;
+                int i = Dots[ind].IndexDot;
                 RemoveNeibor(dot);
-                _Dots[ind] = new Dot(dot.x, dot.y);
-                _Dots[ind].IndexDot = i;
-                _Dots[ind].IndexRelation = i;
+                Dots[ind] = new Dot(dot.x, dot.y);
+                Dots[ind].IndexDot = i;
+                Dots[ind].IndexRelation = i;
                 ListMoves.Remove(dot);
                 stackMoves.Remove(dot);
             }
@@ -288,11 +277,11 @@ namespace DotsGame
         }
         public void UnmarkAllDots()
         {
-            foreach (Dot d in _Dots) d.UnmarkDot();
+            foreach (Dot d in Dots) d.UnmarkDot();
         }
         private int MinX()
         {
-            var q = from Dot d in _Dots where d.Own != 0 & d.Blocked == false select d;
+            var q = from Dot d in Dots where d.Own != 0 & d.Blocked == false select d;
             int minX = BoardWidth;
             foreach (Dot d in q)
             {
@@ -302,7 +291,7 @@ namespace DotsGame
         }
         private int MaxX()
         {
-            var q = from Dot d in _Dots where d.Own != 0 & d.Blocked == false select d;
+            var q = from Dot d in Dots where d.Own != 0 & d.Blocked == false select d;
             int maxX = 0;
             foreach (Dot d in q)
             {
@@ -312,7 +301,7 @@ namespace DotsGame
         }
         private int MaxY()
         {
-            var q = from Dot d in _Dots where d.Own != 0 & d.Blocked == false select d;
+            var q = from Dot d in Dots where d.Own != 0 & d.Blocked == false select d;
             int maxY = 0;
             foreach (Dot d in q)
             {
@@ -322,7 +311,7 @@ namespace DotsGame
         }
         private int MinY()
         {
-            var q = from Dot d in _Dots where d.Own != 0 & d.Blocked == false select d;
+            var q = from Dot d in Dots where d.Own != 0 & d.Blocked == false select d;
             int minY = BoardHeight;
             foreach (Dot d in q)
             {
@@ -332,14 +321,14 @@ namespace DotsGame
         }
         private int CountNeibourDots(int Owner)//количество точек определенного цвета возле пустой точки
         {
-            var q = from Dot d in _Dots
+            var q = from Dot d in Dots
                     where d.Blocked == false & d.Own == 0 &
-                    _Dots[IndexDot(d.x + 1, d.y -1)].Blocked == false & _Dots[IndexDot(d.x + 1, d.y -1)].Own == Owner & 
-                    _Dots[IndexDot(d.x + 1, d.y + 1)].Blocked == false & _Dots[IndexDot(d.x + 1, d.y + 1)].Own == Owner
-                    | d.Own == 0 & _Dots[IndexDot(d.x, d.y -1)].Blocked == false & _Dots[IndexDot(d.x, d.y -1)].Own == Owner & _Dots[IndexDot(d.x, d.y + 1)].Blocked == false & _Dots[IndexDot(d.x, d.y + 1)].Own == Owner
-                    | d.Own == 0 & _Dots[IndexDot(d.x -1, d.y -1)].Blocked == false & _Dots[IndexDot(d.x -1, d.y -1)].Own == Owner & _Dots[IndexDot(d.x -1, d.y + 1)].Blocked == false & _Dots[IndexDot(d.x -1, d.y + 1)].Own == Owner
-                    | d.Own == 0 & _Dots[IndexDot(d.x -1, d.y -1)].Blocked == false & _Dots[IndexDot(d.x -1, d.y -1)].Own == Owner & _Dots[IndexDot(d.x + 1, d.y + 1)].Blocked == false & _Dots[IndexDot(d.x + 1, d.y + 1)].Own == Owner
-                    | d.Own == 0 & _Dots[IndexDot(d.x -1, d.y + 1)].Blocked == false & _Dots[IndexDot(d.x -1, d.y + 1)].Own == Owner & _Dots[IndexDot(d.x + 1, d.y -1)].Blocked == false & _Dots[IndexDot(d.x + 1, d.y -1)].Own == Owner
+                    Dots[IndexDot(d.x + 1, d.y -1)].Blocked == false & Dots[IndexDot(d.x + 1, d.y -1)].Own == Owner & 
+                    Dots[IndexDot(d.x + 1, d.y + 1)].Blocked == false & Dots[IndexDot(d.x + 1, d.y + 1)].Own == Owner
+                    | d.Own == 0 & Dots[IndexDot(d.x, d.y -1)].Blocked == false & Dots[IndexDot(d.x, d.y -1)].Own == Owner & Dots[IndexDot(d.x, d.y + 1)].Blocked == false & Dots[IndexDot(d.x, d.y + 1)].Own == Owner
+                    | d.Own == 0 & Dots[IndexDot(d.x -1, d.y -1)].Blocked == false & Dots[IndexDot(d.x -1, d.y -1)].Own == Owner & Dots[IndexDot(d.x -1, d.y + 1)].Blocked == false & Dots[IndexDot(d.x -1, d.y + 1)].Own == Owner
+                    | d.Own == 0 & Dots[IndexDot(d.x -1, d.y -1)].Blocked == false & Dots[IndexDot(d.x -1, d.y -1)].Own == Owner & Dots[IndexDot(d.x + 1, d.y + 1)].Blocked == false & Dots[IndexDot(d.x + 1, d.y + 1)].Own == Owner
+                    | d.Own == 0 & Dots[IndexDot(d.x -1, d.y + 1)].Blocked == false & Dots[IndexDot(d.x -1, d.y + 1)].Own == Owner & Dots[IndexDot(d.x + 1, d.y -1)].Blocked == false & Dots[IndexDot(d.x + 1, d.y -1)].Own == Owner
                     select d;
             return q.Count();
         }
@@ -369,19 +358,20 @@ namespace DotsGame
         /// Проверка, находится ли точка на игровой доске
         /// </summary>
         /// <returns></returns>
-        private bool DotIndexCheck(Dot dot)
-        {
-            return dot==null? false : (dot.x >= 0 && dot.x < BoardWidth &&
-                    dot.y >= 0 && dot.y < BoardHeight);
-        }
+        //private bool DotIndexCheck(Dot dot)
+        //{
+        //    bool v = dot == null;
+        //    return v ? false : (dot.x >= 0 && dot.x < BoardWidth &&
+        //            dot.y >= 0 && dot.y < BoardHeight);
+        //}
         private List<Dot> EmptyNeibourDots(int Owner)//список не занятых точек возле определенной точки
         {
             List<Dot> ld = new List<Dot>();
-            foreach (Dot d in _Dots)
+            foreach (Dot d in Dots)
             {
                 if (d.Own == Owner)
                 {
-                    var q = from Dot dot in _Dots
+                    var q = from Dot dot in Dots
                             where dot.Blocked == false & dot.Own == 0 & Distance(dot, d) < 2
                             select dot;
                     foreach (Dot empty_d in q)
@@ -408,7 +398,7 @@ namespace DotsGame
         }
         public void Clear()//Не очищает список, а заменяет точки на Own == 0
         {
-            foreach (Dot d in _Dots)
+            foreach (Dot d in Dots)
             {
                 d.Own = 0;
                 d.Marked = false;
@@ -586,8 +576,25 @@ namespace DotsGame
 
             return ptrns;//null;
         }
+
+        public bool CheckValidMove(Dot CheckDotForMove)
+        {
+            if (CheckDotForMove is null) return false;
+
+            Dot d = Dots.Find(x => x.x == CheckDotForMove.x && x.y == CheckDotForMove.y);
+            if (d is null)
+            {
+                return false;
+            }
+            return d.Blocked == false && d.Own == 0;
+        }
+
+
+
         private int count_in_region;
         private int count_blocked_dots;
+
+
 
         /// <summary>
         /// Функция делает ход игрока 
@@ -598,7 +605,7 @@ namespace DotsGame
         public int MakeMove(Dot dot, int Owner = 0, bool addForDraw = false)//
         {
 
-            if (this[dot.x, dot.y].ValidMove)
+            if (CheckValidMove(this[dot.x, dot.y]))
             {
                 if (Owner != 0) dot.Own = Owner;
                 Add(dot); //если точка не занята
@@ -611,7 +618,7 @@ namespace DotsGame
             count_blocked_dots = (from Dot d in Dots where d.Blocked select d).Count();
             if (addForDraw)
             {
-                ListMoves.Add(_Dots[IndexDot(dot.x, dot.y)]);
+                ListMoves.Add(Dots[IndexDot(dot.x, dot.y)]);
                 LinkDots();//перестроить связи точек
                 _ListLinksForDrawing = lnks.ToList();
             }
@@ -1050,11 +1057,17 @@ namespace DotsGame
         {
             return NeiborDots(d1).Intersect(NeiborDots(d2), new DotEq()).ToList();
         }
+
+        //==============================================================================================
+        /// <summary>
+        /// проверяет ход в результате которого окружение.
+        /// </summary>
+        /// <param name="Owner">владелец проверянмых точек</param>
+        /// <returns>Возвращает ход(точку) который завершает окружение</returns>
         private Dot CheckMove(int Owner)
         {
             List<Dot> happy_dots = new List<Dot>();
-            var qry = from Dot d1 in this
-                      where d1.Own == Owner
+            var qry = from Dot d1 in this where d1.Own == Owner
                       from Dot d2 in this
                       where
                             d2.IndexRelation == d1.IndexRelation
@@ -1065,7 +1078,7 @@ namespace DotsGame
                             d2.IndexRelation == d1.IndexRelation
                             && Distance(d1, d2) == 2
                       from Dot d in this
-                      where d.ValidMove && Distance(d, d1) < 2 && Distance(d, d2) < 2 
+                      where CheckValidMove(d) && Distance(d, d1) < 2 && Distance(d, d2) < 2 
                                 && NeiborDotsSNWE(d).Where(dt=>dt.Own==Owner).Count() <= 2
                       select d;
             
@@ -1105,7 +1118,7 @@ namespace DotsGame
                 {
                     foreach (Dot dot_move in NeiborDots(d))
                     {
-                        if (dot_move.ValidMove)
+                        if (CheckValidMove(dot_move))
                         {
                             //делаем ход
                             int result_last_move = MakeMove(dot_move, Owner);
@@ -1147,7 +1160,7 @@ namespace DotsGame
                       where de1.Own != Owner && Distance(de2, d2) == 1.4f
                             && Distance(de2, de1) == 2
                       from Dot dm in EmptyNeibourDots(Owner)
-                      where dm.ValidMove && Distance(dm, d1) == 1.4f
+                      where CheckValidMove(dm) && Distance(dm, d1) == 1.4f
                             && Distance(dm, d2) == 1
                             && Distance(dm, de1) == 1
                             && Distance(dm, de2) == 1
@@ -2390,8 +2403,8 @@ namespace DotsGame
                               && Distance(d1, d2) >= 2
                               && Distance(d1, d2) < 3
                       from Dot dm in this
-                      where dm.ValidMove & Distance(dm, d1) < 2 
-                      && dm.ValidMove & Distance(dm, d2) < 2
+                      where CheckValidMove(dm) & Distance(dm, d1) < 2 
+                      && CheckValidMove(dm) & Distance(dm, d2) < 2
                       select dm;
             List<Dot> ld = qry.Distinct(new DotEq()).ToList();
             foreach (Dot d in ld) d.Tag = "CheckPatternMove(" + Owner + ")";
@@ -2409,18 +2422,6 @@ namespace DotsGame
             if (IndexRelation)
             {
                 qry = from Dot d1 in this
-                          //where d1.Own == Owner && !d1.Blocked
-                          //from Dot d2 in this
-                          //where d2.IndexRelation == d1.IndexRelation && !d2.Blocked && Distance(d1, d2) < 3.5f & Distance(d1, d2) >= 3f
-                          //from Dot de1 in this
-                          //where de1.ValidMove & Distance(d1, de1) == 1
-                          //from Dot de2 in this
-                          //where de2.ValidMove & Distance(de1, de2) == 1 & Distance(d1, de2) < 2
-                          //from Dot de3 in this
-                          //where de3.ValidMove & Distance(d2, de3) < 2 & Distance(de2, de3) == 1
-                          //   || de3.ValidMove & Distance(d2, de3) < 2 & Distance(de1, de3) == 1
-
-                          //select new Dot(de3.x, de3.y, NumberPattern: 777, Rating: 1);
                       where d1.Own == Owner && !d1.Blocked
                       from Dot d2 in this
                       where d2.IndexRelation == d1.IndexRelation && !d2.Blocked && Distance(d1, d2) < 3.5f & Distance(d1, d2) >= 3f
@@ -2431,7 +2432,6 @@ namespace DotsGame
                       from Dot de3 in EmptyNeibourDots(Owner)
                       where  Distance(de3, d2)  < 2 && Distance(de3, de1) < 2
                       select new Dot(de3.x, de3.y, NumberPattern: 777, Rating: 1);
-
             }
             else
             {
@@ -2440,12 +2440,12 @@ namespace DotsGame
                           from Dot d2 in this
                           where d2.Own == Owner && !d2.Blocked && Distance(d1, d2) < 3.5f & Distance(d1, d2) >= 3
                           from Dot de1 in this
-                          where de1.ValidMove & Distance(d1, de1) == 1
+                          where CheckValidMove(de1) & Distance(d1, de1) == 1
                           from Dot de2 in this
-                          where de2.ValidMove & Distance(de1, de2) == 1 & Distance(d1, de2) < 2
+                          where CheckValidMove(de2) & Distance(de1, de2) == 1 & Distance(d1, de2) < 2
                           from Dot de3 in this
-                          where de3.ValidMove & Distance(d2, de3) < 2 & Distance(de2, de3) == 1
-                             || de3.ValidMove & Distance(d2, de3) < 2 & Distance(de1, de3) == 1
+                          where CheckValidMove(de3) & Distance(d2, de3) < 2 & Distance(de2, de3) == 1
+                             || CheckValidMove(de3) & Distance(d2, de3) < 2 & Distance(de1, de3) == 1
                           select de3;
 
             }
@@ -2466,20 +2466,20 @@ namespace DotsGame
                       where d2.IndexRelation == d1.IndexRelation && !d2.Blocked && Distance(d1, d2) < 4.5f & Distance(d1, d2) >= 2.5f
 
                       from Dot de1 in this
-                      where de1.ValidMove & Distance(d1, de1) == 1
+                      where CheckValidMove(de1) & Distance(d1, de1) == 1
 
                       from Dot de2 in this
-                      where de2.ValidMove & Distance(d2, de2) == 1
+                      where CheckValidMove(de2) & Distance(d2, de2) == 1
 
                       from Dot de1_1 in this
-                      where de1_1.ValidMove & Distance(de1_1, de1) == 1 & Distance(de1_1, d1) < 2
+                      where CheckValidMove(de1_1) & Distance(de1_1, de1) == 1 & Distance(de1_1, d1) < 2
 
                       from Dot de2_1 in this
-                      where de2_1.ValidMove & Distance(de2_1, de2) == 1 & Distance(de2_1, d2) < 2
+                      where CheckValidMove(de2_1) & Distance(de2_1, de2) == 1 & Distance(de2_1, d2) < 2
 
 
                       from Dot de3 in this
-                      where de3.ValidMove & Distance(de1, de3) < 2
+                      where CheckValidMove(de3) & Distance(de1, de3) < 2
                                           & Distance(de2, de3) < 2
                                           & Distance(de1_1, de3) < 2
                                           & Distance(de2_1, de3) < 2
@@ -2497,20 +2497,20 @@ namespace DotsGame
                       where d2.Own == d1.Own && !d2.Blocked && Distance(d1, d2) < 4.5f & Distance(d1, d2) >= 2.5f
 
                       from Dot de1 in this
-                      where de1.ValidMove & Distance(d1, de1) == 1
+                      where CheckValidMove(de1) & Distance(d1, de1) == 1
 
                       from Dot de2 in this
-                      where de2.ValidMove & Distance(d2, de2) == 1
+                      where CheckValidMove(de2) & Distance(d2, de2) == 1
 
                       from Dot de1_1 in this
-                      where de1_1.ValidMove & Distance(de1_1, de1) == 1 & Distance(de1_1, d1) < 2
+                      where CheckValidMove(de1_1) & Distance(de1_1, de1) == 1 & Distance(de1_1, d1) < 2
 
                       from Dot de2_1 in this
-                      where de2_1.ValidMove & Distance(de2_1, de2) == 1 & Distance(de2_1, d2) < 2
+                      where CheckValidMove(de2_1) & Distance(de2_1, de2) == 1 & Distance(de2_1, d2) < 2
 
 
                       from Dot de3 in this
-                      where de3.ValidMove & Distance(de1, de3) < 2
+                      where CheckValidMove(de3) & Distance(de1, de3) < 2
                                           & Distance(de2, de3) < 2
                                           & Distance(de1_1, de3) < 2
                                           & Distance(de2_1, de3) < 2
@@ -2617,7 +2617,7 @@ namespace DotsGame
             DebugInfo.textDBG = "CheckMove(pl2,pl1)...";
 #endif
             bm = CheckMove(pl2);
-            if (DotIndexCheck(bm))
+            if (CheckValidMove(bm))
             {
 #region DEBUG
 #if DEBUG
@@ -2632,7 +2632,7 @@ namespace DotsGame
                 //return bm;
             }
             bm = CheckMove(pl1);
-            if (DotIndexCheck(bm))
+            if (CheckValidMove(bm))
             {
                 #region DEBUG
 #if DEBUG
@@ -2659,7 +2659,7 @@ namespace DotsGame
 #region CheckPattern_vilochka
             bm = CheckPattern_vilochka(pl2);
             //if (bm != null)
-            if (DotIndexCheck(bm))
+            if (CheckValidMove(bm))
             {
 #region DEBUG
 #if DEBUG
@@ -2675,7 +2675,7 @@ namespace DotsGame
 
             bm = CheckPattern_vilochka(pl1);
             // if (bm != null)
-            if (DotIndexCheck(bm))
+            if (CheckValidMove(bm))
             {
 #region DEBUG
 #if DEBUG
@@ -2709,9 +2709,9 @@ namespace DotsGame
             List<Dot> ld_bm = CheckPattern2Move(pl2, true);
             ld_bm.AddRange(CheckPatternVilka2x2(pl2, true));
             ld_bm.AddRange(CheckPatternVilka2x2(pl2, false));
-            ld_bm.AddRange(CheckPattern2Move(pl1, true));
-            ld_bm.AddRange(CheckPatternVilka2x2(pl1, true));
-            ld_bm.AddRange(CheckPatternVilka2x2(pl1, false));
+            //ld_bm.AddRange(CheckPattern2Move(pl1, true));
+            //ld_bm.AddRange(CheckPatternVilka2x2(pl1, true));
+            //ld_bm.AddRange(CheckPatternVilka2x2(pl1, false));
             if (ld_bm.Count > 0)moves.AddRange(ld_bm);
             #region DEBUG
 #if DEBUG
@@ -2804,11 +2804,11 @@ namespace DotsGame
             #region CheckPatternMove
             foreach (Dot dt in CheckPatternMove(pl2))
             {
-                if (DotIndexCheck(dt) && (CheckDot(dt, pl2) == false)) moves.Add(dt);
+                if (CheckValidMove(dt) && (CheckDot(dt, pl2) == false)) moves.Add(dt);
             }
             foreach (Dot dt in CheckPatternMove(pl1))
             {
-                if (DotIndexCheck(dt) && (CheckDot(dt, pl1) == false)) moves.Add(dt);
+                if (CheckValidMove(dt) && (CheckDot(dt, pl1) == false)) moves.Add(dt);
             }
 
 #if DEBUG
@@ -2847,8 +2847,8 @@ namespace DotsGame
 
             lst_best_move = BestMove(player1, player2);
             foreach (Dot d in lst_best_move) d.Rating += counter_moves;
-            tempmove = lst_best_move.Where(dt => dt.iNumberPattern == 777 & dt.Rating == 0
-                                               | dt.iNumberPattern == 666 & dt.Rating == lst_best_move.Min(d => d.Rating)).ElementAtOrDefault(0);
+            tempmove = lst_best_move.Where(dt => (dt.iNumberPattern == 777 & dt.Rating == 1)
+                                               || (dt.iNumberPattern == 666 & dt.Rating == lst_best_move.Min(d => d.Rating))).ElementAtOrDefault(0);
 
             //если есть паттерн на окружение противника тоже устанавливается бест мув
             if (tempmove != null) 
@@ -3076,13 +3076,13 @@ namespace DotsGame
         {
             position = -1;
             //return this;
-            return _Dots.GetEnumerator();
+            return Dots.GetEnumerator();
         }
         //IEnumerator
         public bool MoveNext()
         {
             position++;
-            return (position < _Dots.Count);
+            return (position < Dots.Count);
         }
         //IEnumerable
         public void Reset()
@@ -3098,15 +3098,15 @@ namespace DotsGame
             throw new NotImplementedException();
         }
 
-        public bool IsValidMove(Dot move)
-        {
-            return move.ValidMove; 
-        }
+        //public bool IsValidMove(Dot move)
+        //{
+        //    return move.ValidMove; 
+        //}
 
-        public bool IsValidMove(int row, int column)
-        {
-            return this[row,column].ValidMove; ;
-        }
+        //public bool IsValidMove(int row, int column)
+        //{
+        //    return this[row,column].ValidMove; ;
+        //}
 
         public bool IsGameOver
         {
@@ -3160,7 +3160,11 @@ namespace DotsGame
         /// </returns>
         private int MovePlayer(int Player, CancellationToken? cancellationToken, Dot pl_move = null)
         {
-            if (pl_move == null) pl_move = PickComputerMove(LastMove, cancellationToken);
+            if (pl_move == null)
+            {
+                pl_move = PickComputerMove(LastMove, cancellationToken);
+            }
+
             if (pl_move == null)
             {
                 //MessageBox.Show("You win!!! \r\n" + game.Statistic());
@@ -3190,17 +3194,17 @@ namespace DotsGame
 
         }
 
-        void IGame.Move(int player, CancellationToken? cancellationToken, Dot pl_move)
-        {
-            throw new NotImplementedException();
-        }
+        //void IGame.Move(int player, CancellationToken? cancellationToken, Dot pl_move)
+        //{
+        //    throw new NotImplementedException();
+        //}
 
         //IEnumerable
         public object Current
         {
             get
             {
-                return _Dots[position];
+                return Dots[position];
             }
         }
 

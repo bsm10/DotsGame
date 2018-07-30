@@ -7,15 +7,10 @@ namespace DotsGame
     {
         public Dot Dot1;
         public Dot Dot2;
+
         //private float cost;
-        public float Distance
-        { 
-            get
-            {
-                return (float)Math.Sqrt(Math.Pow(Math.Abs(Dot1.x - Dot2.x), 2) +
-                                    Math.Pow(Math.Abs(Dot1.y - Dot2.y), 2));
-            }
-        }
+        public float Distance => (float)Math.Sqrt(Math.Pow(Math.Abs(Dot1.x - Dot2.x), 2) +
+                                Math.Pow(Math.Abs(Dot1.y - Dot2.y), 2));
         public override string ToString()
         {
             string s = string.Empty;
@@ -336,9 +331,9 @@ namespace DotsGame
 
         }
         
-        public bool ValidMove
-        {
-            get { return Blocked == false && Own == 0; }
-        }
+        //public bool ValidMove
+        //{
+        //    get { return Blocked == false && Own == 0; }
+        //}
     }
 }

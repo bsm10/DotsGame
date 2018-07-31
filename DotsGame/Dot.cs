@@ -132,14 +132,13 @@ namespace DotsGame
     public class Dot: IEquatable<Dot>
     {
         public int x, y;
-        private int _Own;
         private bool _Blocked; 
-        public bool Blocked 
-        { 
-            get {return _Blocked;}
+        public bool Blocked
+        {
+            get => _Blocked;
             set
             {
-                _Blocked=value;
+                _Blocked = value;
                 if (_Blocked)
                 {
                     IndexRelation = 0;
@@ -153,41 +152,18 @@ namespace DotsGame
                 }
             }
         }
-        private List<Dot> _BlokingDots;
-        public List<Dot> BlokingDots 
-            {
-                get
-                { 
-                    return _BlokingDots;//Список точек, которые блокируются этой точкой
-                }
-            }
-        private List<Dot> _NeiborDots = new List<Dot>();
+        /// <summary>
+        /// Список точек, которые блокируются этой точкой
+        /// </summary>
+        public List<Dot> BlokingDots { get; }
         /// <summary>
         /// Точки по соседству с єтой точкой
         /// </summary>
-        public List<Dot> NeiborDots
-        {
-            get
-            {
-                return _NeiborDots;//Список соседних точек
-            }
-        }
+        public List<Dot> NeiborDots { get; } = new List<Dot>();
         public bool Fixed { get; set; }
-        public int CountBlockedDots { get; set; }
+        public int CountBlockedDots { get=>BlokingDots.Count; }
         public bool Selected { get; set; }
-        public int Own
-        {
-            get { return _Own; }
-            set
-            {
-                _Own = value;
-                //if (_Own==0)
-                //{
-                //    Blocked = false;
-                //}
-            }
-
-        }
+        public int Own { get; set; }
         private int rating;
         public int Rating 
         {
@@ -210,19 +186,8 @@ namespace DotsGame
             }
         }
         public bool Marked { get; set; }
+        public string Tag { get; set; } = string.Empty;
 
-        private string _Tag = string.Empty;
-        public string Tag
-        {
-            get
-            {
-                return _Tag;
-            }
-            set
-            {
-                _Tag = value;
-            }
-        }
         private int _IndexDot;
         public int IndexDot
         {
@@ -254,11 +219,22 @@ namespace DotsGame
         {
             this.x = x;
             this.y = y;
-            _BlokingDots = new List<Dot>();
+            BlokingDots = new List<Dot>();
             Own = Owner;
             iNumberPattern = NumberPattern;
             this.Rating = Rating;
             //IndexRelation = IndexDot;
+        }
+        /// <summary>
+        /// Восстанавливаем первоначальное состояние точки
+        /// </summary>
+        public void Restore()
+        {
+            BlokingDots.Clear();
+            Own = 0;
+            iNumberPattern = 0;
+            Rating = 0;
+            Tag = "";
         }
         public void UnmarkDot()
         {

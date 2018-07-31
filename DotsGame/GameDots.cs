@@ -24,9 +24,9 @@ namespace DotsGame
         private const int PLAYER_HUMAN = 1;
         private const int PLAYER_COMPUTER = 2;
 
-        private IList<Dot> list_moves; //список ходов
+        private List<Dot> list_moves; //список ходов
 
-        public IList<Dot> ListMoves // список ходов
+        public List<Dot> ListMoves // список ходов
         {
             get { return list_moves; }
             set { list_moves = value; }
@@ -116,25 +116,10 @@ namespace DotsGame
 
         private int win_player;//переменная получает номер игрока, котрый окружил точки
         int position = -1;
-        private int nBoardWidth;//размер поля
-        private int nBoardHeight;//размер поля
-        public int BoardWidth
-        {
-            get { return nBoardWidth; }
-            set { nBoardWidth = value; }
-        }
-        public int BoardHeight
-        {
-            get { return nBoardHeight; }
-            set { nBoardHeight = value; }
-        }
-        private int BoardSize
-        {
-            get
-            {
-                return nBoardWidth * nBoardHeight;
-            }
-        }
+
+        public int BoardWidth { get; set; }
+        public int BoardHeight { get; set; }
+        private int BoardSize => BoardWidth * BoardHeight;
         public GameDots(int boardwidth, int boardheight)
         {
             int counter = 0;
@@ -158,6 +143,18 @@ namespace DotsGame
             list_moves = new List<Dot>();
             stackMoves = new List<Dot>();
             dots_in_region = new List<Dot>();
+
+        }
+        public void NewGame()
+        {
+            foreach(Dot d in Dots)
+            {
+                d.Restore();
+            }
+            lnks.Clear();
+            list_moves.Clear();
+            stackMoves.Clear();
+            dots_in_region.Clear();
 
         }
         public class DotEq : EqualityComparer<Dot>
@@ -626,13 +623,14 @@ namespace DotsGame
         }
 
 
-        /// <summary>
-        /// проверяет блокировку точек, маркирует точки которые блокируют, возвращает количество окруженных точек
-        /// </summary>
-        /// <param name="arrDots"></param>
-        /// <param name="last_moveOwner"></param>
-        /// <returns>количество окруженных точек</returns>
-        private int CheckBlocked(int last_moveOwner = 0)
+
+            /// <summary>
+            /// проверяет блокировку точек, маркирует точки которые блокируют, возвращает количество окруженных точек
+            /// </summary>
+            /// <param name="arrDots"></param>
+            /// <param name="last_moveOwner"></param>
+            /// <returns>количество окруженных точек</returns>
+            private int CheckBlocked(int last_moveOwner = 0)
         {
             int counter = 0;
             var checkdots = from Dot dots in this
@@ -1034,7 +1032,7 @@ namespace DotsGame
                 if (result_last_move != 0 & this[d.x, d.y].Blocked == false)
                 {
                     UndoMove(d);
-                    d.CountBlockedDots = result_last_move;
+                    //d.CountBlockedDots = result_last_move;
                     happy_dots.Add(d);
                     //return d;
                 }
@@ -1093,7 +1091,7 @@ namespace DotsGame
                 if (result_last_move != 0 & this[d.x, d.y].Blocked == false)
                 {
                     UndoMove(d);
-                    d.CountBlockedDots = result_last_move;
+                   // d.CountBlockedDots = result_last_move;
                     happy_dots.Add(d);
                     //break;
                 }
@@ -3125,15 +3123,19 @@ namespace DotsGame
         //    return Move(Player, cancellationToken)
         //}
 
+        //public async Task<int> MoveAsync(int player, CancellationToken? cancellationToken, Dot pl_move = null)
+        //{
+        //    int result = await Move(player, cancellationToken, pl_move);
+        //    return result;
+        //}
 
-        public Task<int> Move(int Player, CancellationToken? cancellationToken, Dot pl_move = null)
+        public Task<int> MoveAsync(int Player, CancellationToken? cancellationToken, Dot pl_move = null)
         {
             var tcs = new TaskCompletionSource<int>();
             Task.Factory.StartNew(() => {
                 try
                 {
-                    var result = MovePlayer(Player, cancellationToken, pl_move);
-                    tcs.SetResult(result);
+                    tcs.SetResult(MovePlayer(Player, cancellationToken, pl_move));
                 }
                 catch (Exception ex)
                 {
@@ -3143,7 +3145,7 @@ namespace DotsGame
             return tcs.Task;
         }
 
-        CancellationTokenSource tokenSource = new CancellationTokenSource();
+       
         //CancellationToken ct;
 
         /// <summary>
@@ -3194,55 +3196,19 @@ namespace DotsGame
 
         }
 
-        //void IGame.Move(int player, CancellationToken? cancellationToken, Dot pl_move)
-        //{
-        //    throw new NotImplementedException();
-        //}
+        public object Current => Dots[position];
 
-        //IEnumerable
-        public object Current
+        public List<Dot> Board
         {
-            get
-            {
-                return Dots[position];
-            }
+            get => throw new NotImplementedException();
+
+            set => throw new NotImplementedException();
         }
 
-        public IList<Dot> Board
-        {
-            get
-            {
-                throw new NotImplementedException();
-            }
+        public State CurrentPlayer => throw new NotImplementedException();
 
-            set
-            {
-                throw new NotImplementedException();
-            }
-        }
+        public State CurrentOpponent => throw new NotImplementedException();
 
-        public State CurrentPlayer
-        {
-            get
-            {
-                throw new NotImplementedException();
-            }
-        }
-
-        public State CurrentOpponent
-        {
-            get
-            {
-                throw new NotImplementedException();
-            }
-        }
-
-        public State Winner
-        {
-            get
-            {
-                throw new NotImplementedException();
-            }
-        }
+        public State Winner => throw new NotImplementedException();
     }
 }

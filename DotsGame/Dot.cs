@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Drawing;
 
 namespace DotsGame
 {
@@ -35,21 +36,9 @@ namespace DotsGame
             return hashLinkDot1 * hashLinkDot2;
         }
 
-        public bool Blocked
-        {
-            get
-            {
-                return (Dot1.Blocked & Dot2.Blocked);
-            }
-        }
+        public bool Blocked => (Dot1.Blocked & Dot2.Blocked);
 
-        public bool Fixed
-        {
-            get
-            {
-                return (Dot1.Fixed | Dot2.Fixed);
-            }
-        }
+        public bool Fixed => (Dot1.Fixed | Dot2.Fixed);
 
 
         public Links(Dot dot1, Dot dot2)
@@ -225,6 +214,18 @@ namespace DotsGame
             this.Rating = Rating;
             //IndexRelation = IndexDot;
         }
+
+        public Dot(Point p)
+        {
+            x = p.X;
+            y = p.Y;
+            BlokingDots = new List<Dot>();
+            Own = 0;
+            iNumberPattern = 0;
+            Rating = Rating;
+        }
+
+
         /// <summary>
         /// Восстанавливаем первоначальное состояние точки
         /// </summary>

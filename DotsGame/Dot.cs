@@ -1,6 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Drawing;
+using System.Reflection;
+using System.Windows.Forms;
 
 namespace DotsGame
 {
@@ -10,8 +12,8 @@ namespace DotsGame
         public Dot Dot2;
 
         //private float cost;
-        public float Distance => (float)Math.Sqrt(Math.Pow(Math.Abs(Dot1.x - Dot2.x), 2) +
-                                Math.Pow(Math.Abs(Dot1.y - Dot2.y), 2));
+        public float Distance => (float)Math.Sqrt(Math.Pow(Math.Abs(Dot1.X - Dot2.X), 2) +
+                                Math.Pow(Math.Abs(Dot1.Y - Dot2.Y), 2));
         public override string ToString()
         {
             string s = string.Empty;
@@ -19,7 +21,7 @@ namespace DotsGame
             if (Dot1.Own == 2 & Dot2.Own == 2) s = " Computer";
             if (Dot1.Own == 0 | Dot2.Own == 0) s = " None";
 
-            return Dot1.x + ":" + Dot1.y + "-" + Dot2.x + ":" + Dot2.y + s + " Cost - " + Distance.ToString() + " Fixed " + Fixed.ToString();
+            return Dot1.X + ":" + Dot1.Y + "-" + Dot2.X + ":" + Dot2.Y + s + " Cost - " + Distance.ToString() + " Fixed " + Fixed.ToString();
         }
         public override int GetHashCode()
         {
@@ -86,13 +88,13 @@ namespace DotsGame
     {
         public int Compare(Dot d1, Dot d2)
         {
-            if (d1.x.CompareTo(d2.x) != 0)
+            if (d1.X.CompareTo(d2.X) != 0)
             {
-                return d1.x.CompareTo(d2.x);
+                return d1.X.CompareTo(d2.X);
             }
-            else if (d1.y.CompareTo(d2.y) != 0)
+            else if (d1.Y.CompareTo(d2.Y) != 0)
             {
-                return d1.y.CompareTo(d2.y);
+                return d1.Y.CompareTo(d2.Y);
             }
             else
             {
@@ -104,7 +106,7 @@ namespace DotsGame
     {
         public int Compare(Dot d1, Dot d2)
         {
-            if (d1.x.CompareTo(d2.Own) != 0)
+            if (d1.X.CompareTo(d2.Own) != 0)
             {
                 return d1.Own.CompareTo(d2.Own);
             }
@@ -120,7 +122,6 @@ namespace DotsGame
     }
     public class Dot: IEquatable<Dot>
     {
-        public int x, y;
         private bool _Blocked; 
         public bool Blocked
         {
@@ -206,8 +207,8 @@ namespace DotsGame
 
         public Dot(int x, int y, int Owner = 0, int NumberPattern = 0, int Rating = 0)
         {
-            this.x = x;
-            this.y = y;
+            X = x;
+            Y = y;
             BlokingDots = new List<Dot>();
             Own = Owner;
             iNumberPattern = NumberPattern;
@@ -215,16 +216,24 @@ namespace DotsGame
             //IndexRelation = IndexDot;
         }
 
-        public Dot(Point p)
+        public Dot(MouseEventArgs p)
         {
-            x = p.X;
-            y = p.Y;
+            X = p.X;
+            Y = p.Y;
             BlokingDots = new List<Dot>();
             Own = 0;
             iNumberPattern = 0;
             Rating = Rating;
         }
-
+        //public Dot(Point p)
+        //{
+        //    x = p.X;
+        //    y = p.Y;
+        //    BlokingDots = new List<Dot>();
+        //    Own = 0;
+        //    iNumberPattern = 0;
+        //    Rating = Rating;
+        //}
 
         /// <summary>
         /// Восстанавливаем первоначальное состояние точки
@@ -266,12 +275,27 @@ namespace DotsGame
             if (Own == 1) s = " Player";
             else if (Own == 2) s = " Computer";
             else s = " None";
-            s = Blocked ? x + ":" + y + s + " Blocked" : x + ":" + y + s + " Rating: " + Rating + "; " + Tag;
+            s = Blocked ? X + ":" + Y + s + " Blocked" : X + ":" + Y + s + " Rating: " + Rating + "; " + Tag;
             return s;
         }
+
+        public string DotStatistic
+        {
+            get
+            {
+                string dotstatistic = String.Empty;
+                //GetType().GetProperties().ToDictionary(p => p.Name, p => p.GetValue(d)?.ToString());
+                foreach (PropertyInfo p in GetType().GetProperties())
+                {
+                    dotstatistic = dotstatistic + "\r\n" + p.ToString();
+                }
+                return dotstatistic;
+            }
+        }
+
         public bool Equals(Dot dot)//Проверяет равенство точек по координатам - это для реализации  IEquatable<Dot>
         {
-            return (x == dot.x) & (y == dot.y);
+            return (X == dot.X) & (Y == dot.Y);
         }
         //public bool IsNeiborDots(Dot dot)//возвращает истину если соседние точки рядом. 
         //{
@@ -283,7 +307,6 @@ namespace DotsGame
 
         //}
         private int _IndexRel;
-
         public int IndexRelation
         {
             get { return _IndexRel; }
@@ -307,7 +330,16 @@ namespace DotsGame
             }
 
         }
-        
+
+        public static explicit operator Dot(Point v)
+        {
+            return new Dot(v.X,v.Y);
+        }
+
+        public int X { get; set; }
+        public int Y { get; set; }
+
+
         //public bool ValidMove
         //{
         //    get { return Blocked == false && Own == 0; }

@@ -1,11 +1,14 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio 14
-VisualStudioVersion = 14.0.25420.1
+# Visual Studio 15
+VisualStudioVersion = 15.0.27703.2047
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DotsGame", "DotsGame\DotsGame.csproj", "{F6E2A45D-7C8B-4A7C-AAD7-636596440FCB}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PointsCSharp", "..\PointsCSharp\PointsCSharp\PointsCSharp.csproj", "{FB15D476-C784-4F21-980B-682CE0B6A9A9}"
+	ProjectSection(ProjectDependencies) = postProject
+		{F6E2A45D-7C8B-4A7C-AAD7-636596440FCB} = {F6E2A45D-7C8B-4A7C-AAD7-636596440FCB}
+	EndProjectSection
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Points", "..\Points_win10\Points\Points\Points.csproj", "{3A8B62E0-DEFB-4CFA-8169-B8BA554C6E2B}"
 EndProject
@@ -41,6 +44,7 @@ Global
 		{FB15D476-C784-4F21-980B-682CE0B6A9A9}.Debug|Any CPU.Build.0 = Debug|x86
 		{FB15D476-C784-4F21-980B-682CE0B6A9A9}.Debug|ARM.ActiveCfg = Debug|x86
 		{FB15D476-C784-4F21-980B-682CE0B6A9A9}.Debug|x64.ActiveCfg = Debug|x86
+		{FB15D476-C784-4F21-980B-682CE0B6A9A9}.Debug|x64.Build.0 = Debug|x86
 		{FB15D476-C784-4F21-980B-682CE0B6A9A9}.Debug|x86.ActiveCfg = Debug|x86
 		{FB15D476-C784-4F21-980B-682CE0B6A9A9}.Debug|x86.Build.0 = Debug|x86
 		{FB15D476-C784-4F21-980B-682CE0B6A9A9}.Release|Any CPU.ActiveCfg = Release|x86
@@ -73,5 +77,8 @@ Global
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {EA30CBA2-7FCD-43F9-A24B-09E12711FF97}
 	EndGlobalSection
 EndGlobal
